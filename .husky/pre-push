@@ -1,0 +1,2 @@
+# The full unit suite runs once per push, not once per commit.
+pnpm test --run

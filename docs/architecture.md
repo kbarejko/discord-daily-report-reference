@@ -1,0 +1,171 @@
+# Architecture (HLD)
+
+A Discord bot that collects one short work report per person per day and
+exports them for the internship diary. It runs as a **Next.js app**: Discord
+calls one HTTP endpoint, the app checks the request, saves the report in
+SQLite and answers. No server process stays connected to Discord.
+
+This document fixes the decisions that are expensive to get wrong (§4). The
+ones left open (§6) are yours: make them in a pull request and write down why.
+
+## 1. Scope
+
+**In (MVP, by 30 October):**
+
+- `/raport` opens a form: what I did, hours, problems, plan for tomorrow.
+  Submitting it saves today's report.
+- `/moje-raporty`: your last 7 reports, visible only to you.
+- `/postep`: your hours so far, against the 140-hour internship.
+- `/eksport`: your reports for a date range, as a file for the internship
+  diary.
+- A reminder in the channel at 15:00 on working days for whoever has not
+  reported yet.
+- Deployed on our server, with the database on a persistent volume.
+
+**Out:** a web dashboard (a stretch issue), multiple teams or servers, editing
+reports from the web, attachments, AI summaries.
+
+## 2. How a command travels
+
+```mermaid
+sequenceDiagram
+    actor U as Intern
+    participant D as Discord
+    participant R as /api/interactions
+    participant V as verifySignature
+    participant H as command handler
+    participant DB as SQLite
+
+    U->>D: /raport
+    D->>R: POST interaction (signed)
+    R->>V: raw body + headers
+    V-->>R: valid / invalid
+    alt invalid signature
+        R-->>D: 401
+    else valid
+        R->>H: parsed interaction
+        H-->>R: response (open the form)
+        R-->>D: 200 JSON
+        D-->>U: form
+        U->>D: submits the form
+        D->>R: POST modal submit (signed)
+        R->>H: parsed interaction
+        H->>DB: save report
+        H-->>R: "Saved" (only you see it)
+        R-->>D: 200 JSON
+    end
+```
+
+Every request must be answered within **3 seconds**, or Discord shows "The
+application did not respond". Saving a report fits easily. Anything slower
+(the export) answers "thinking…" first and edits the message when the result
+is ready (D3).
+
+## 3. Modules, and the line between the two tracks
+
+```mermaid
+flowchart LR
+    subgraph A[Track A: Discord]
+        route[app/api/interactions/route.ts] --> verify[discord/verify.ts]
+        route --> router[discord/router.ts]
+        router --> cmds[discord/commands/*]
+        register[scripts/register-commands.ts]
+    end
+    subgraph B[Track B: data and export]
+        repo[reports/repository.ts] --> db[db/schema.ts + db/client.ts]
+        validate[reports/validate.ts]
+        exporter[export/*]
+        progress[reports/progress.ts]
+    end
+    cmds -- "ReportRepository (contract)" --> repo
+    cmds --> validate
+    cmds --> exporter
+    cmds --> progress
+    cron[app/api/cron/reminders/route.ts] --> repo
+```
+
+The two tracks meet in **one interface**, `ReportRepository`. Agree on it in
+the first issue of milestone 1 (#contract), then work in parallel. Track A uses
+an in-memory implementation in tests and in local development until Track B's
+SQLite one is merged.
+
+The starting point for that contract. Change it in the contract pull request
+if you have a reason:
+
+```ts
+type Report = {
+  id: string
+  discordUserId: string
+  /** Local date in Europe/Warsaw, YYYY-MM-DD: the day the report is about. */
+  day: string
+  done: string
+  hours: number
+  problems: string | null
+  plan: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+interface ReportRepository {
+  /** Creates today's report or replaces it: one report per person per day (D7). */
+  upsert(input: Omit<Report, 'id' | 'createdAt' | 'updatedAt'>): Promise<Report>
+  findByUserAndDay(discordUserId: string, day: string): Promise<Report | null>
+  listByUser(discordUserId: string, range: { from: string; to: string }): Promise<Report[]>
+  /** Who reported on a given day, for the reminder. */
+  listUserIdsWithReport(day: string): Promise<string[]>
+}
+```
+
+## 4. Decisions already made
+
+| #   | Decision                                                                                               | Why                                                                                                                                                   |
+| --- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **Interactions over HTTP**, not the gateway. No discord.js.                                            | A slash command is a POST to a URL, so a Next.js Route Handler is the whole bot. Nothing runs 24/7, and it deploys like any other app.                |
+| D2  | **Verify every request's Ed25519 signature** with Web Crypto, no SDK.                                  | Discord refuses to save the endpoint URL until it rejects a bad signature, and anyone could call the URL otherwise. Node 24 has Ed25519 built in.     |
+| D3  | **Answer in under 3 s.** Slow work: a deferred response, then edit the message.                        | Discord's hard limit. A deferred answer buys 15 minutes.                                                                                              |
+| D4  | **Commands are registered by a script** (`pnpm register-commands`), per test server in development.    | Registration is a separate API call, not something the app does at startup. Server-scoped commands update instantly, global ones up to an hour later. |
+| D5  | **SQLite through Drizzle ORM** (`better-sqlite3` driver), migrations with `drizzle-kit`. One instance. | A file is enough for two people's reports, and the schema stays in TypeScript. SQLite allows one writer, so the app runs as a single container.       |
+| D6  | **A day is a date in Europe/Warsaw**, stored as `YYYY-MM-DD` text.                                     | "Today" at 00:30 is a different date in UTC. One rule, in one function, tested at midnight.                                                           |
+| D7  | **One report per person per day.** A second `/raport` the same day replaces the first.                 | The diary has one line per day. Replacing is simpler than merging, and the form opens pre-filled.                                                     |
+| D8  | **Personal replies are ephemeral** (flag 64), visible only to the author.                              | Hours and problems are not for the whole channel. The reminder is the only public message.                                                            |
+| D9  | **Reminders come from an external scheduler** calling `POST /api/cron/reminders` with `CRON_SECRET`.   | A serverless-style app has no reliable in-process timer. Coolify's scheduled task (or any cron) calls the URL.                                        |
+| D10 | **Settings come from environment variables**, checked with zod at startup.                             | A missing key fails at start with its name, instead of as a 401 from Discord an hour later.                                                           |
+| D11 | **Every developer has their own Discord application and test server.**                                 | Discord sends every interaction to one URL. Two people sharing an app would steal each other's requests.                                              |
+
+## 5. Discord reference
+
+The values you will need, so you do not have to dig for them. The full
+documentation is in [Interactions](https://discord.com/developers/docs/interactions/receiving-and-responding).
+
+| What                          | Value                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- |
+| Signature headers             | `X-Signature-Ed25519`, `X-Signature-Timestamp`                                                    |
+| Signed message                | timestamp + **raw** request body (read it with `request.text()`, before any JSON parse)           |
+| Interaction types             | `1` PING · `2` APPLICATION_COMMAND · `5` MODAL_SUBMIT                                             |
+| Response types                | `1` PONG · `4` CHANNEL_MESSAGE_WITH_SOURCE · `5` DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE · `9` MODAL |
+| Ephemeral flag                | `flags: 64`                                                                                       |
+| Edit the deferred answer      | `PATCH /webhooks/{application_id}/{interaction_token}/messages/@original`                         |
+| Register test-server commands | `PUT /applications/{application_id}/guilds/{guild_id}/commands`                                   |
+| Post in a channel (reminder)  | `POST /channels/{channel_id}/messages` with header `Authorization: Bot <token>`                   |
+
+## 6. Left to you
+
+Decide each in its issue, and explain the choice in the pull request:
+
+1. **The table schema.** Columns, types, indexes, and how D7 is enforced (a
+   unique index?).
+2. **The form.** Which fields are required, their length limits, and what the
+   hours field accepts (`7`, `7.5`, `7,5`?).
+3. **The export format.** Markdown, CSV, PDF? It depends on the school's
+   diary template; ask your mentor for it.
+4. **The command names and texts.** Polish, short, consistent.
+5. **Whether a web page is worth building at all** (stretch milestone).
+
+## 7. Risks
+
+| Risk                                            | Mitigation                                                                                                       |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Discord cannot reach your laptop                | A tunnel (`docs/development.md`). Check it with the PING issue first.                                            |
+| A request takes longer than 3 s on a cold start | Keep handlers small. Defer anything that calls another API.                                                      |
+| The SQLite file is lost on redeploy             | A persistent volume on the server (deploy issue).                                                                |
+| The bot token leaks                             | Server side only, never with `NEXT_PUBLIC_`. If it leaks, reset it in the Developer Portal and tell your mentor. |

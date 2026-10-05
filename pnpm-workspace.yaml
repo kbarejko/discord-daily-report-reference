@@ -1,0 +1,7 @@
+# pnpm settings live here (pnpm 11+ no longer reads them from .npmrc or
+# package.json). Only the packages listed may run install scripts.
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+  # SQLite driver chosen in docs/architecture.md (D5). It compiles a native module.
+  better-sqlite3: true
