@@ -85,7 +85,7 @@ flowchart LR
 ```
 
 The two tracks meet in **one interface**, `ReportRepository`. Agree on it in
-the first issue of milestone 1 (#contract), then work in parallel. Track A uses
+the first issue of milestone 1 ([#5](https://github.com/DigitalVantage/discord-daily-report/issues/5)), then work in parallel. Track A uses
 an in-memory implementation in tests and in local development until Track B's
 SQLite one is merged.
 
