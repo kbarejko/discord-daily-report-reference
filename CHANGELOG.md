@@ -7,4 +7,5 @@ same pull request as the code.
 
 ### Docs
 
+- Working hours and the daily log issues in the README.
 - Architecture (HLD), local development guide and the team-of-two workflow.

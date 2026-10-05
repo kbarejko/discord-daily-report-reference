@@ -73,10 +73,20 @@ Agree on it **together** in the first days, in one pull request.
 
 ### Every day
 
-- A report in the internship diary. Once milestone 2 is merged, use the bot
-  itself: `/raport`.
+- **Daily meeting at 12:00** on Google Meet (sometimes a little later).
+- **Work during the day**, somewhere between 9:00 and 19:00 on working days,
+  **never at night**: the reviews you wait for happen in the day.
+- **A daily log entry** at the end of your work, as a comment in your pinned
+  issue: [#40 Artem](https://github.com/DigitalVantage/discord-daily-report/issues/40),
+  [#41 Mykyta](https://github.com/DigitalVantage/discord-daily-report/issues/41)
+  (the format is inside). Once milestone 2 is merged, use the bot itself:
+  `/raport`.
 - Blocked on something only the mentor can do (keys, the server, access)?
   Say so on Discord the same day.
+
+> 🇵🇱 Codziennie: spotkanie o 12:00, praca w dzień (między 9:00 a 19:00, nigdy
+> w nocy), na koniec dnia wpis w swoim dzienniku praktyk (#40 Artem, #41
+> Mykyta). Od M2 raporty przez bota: `/raport`.
 
 ## Milestones
 
