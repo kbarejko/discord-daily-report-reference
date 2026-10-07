@@ -1,12 +1,11 @@
 import { getEnv } from '@/env'
 import type { Context } from '@/discord/context'
-import { routeCommand } from '@/discord/router'
+import { routeCommand, routeModal } from '@/discord/router'
 import { type Interaction, InteractionResponseType, InteractionType } from '@/discord/types'
 import { verifySignature } from '@/discord/verify'
 import { MemoryReportRepository } from '@/reports/memory-repository'
 
-// Until #20 wires the SQLite repository, the app keeps reports in memory: they
-// live as long as the process. Good enough to try the form on a test server.
+// Until #20 wires the SQLite repository, the app keeps reports in memory.
 const reports = new MemoryReportRepository()
 
 /** Discord sends every interaction here as a signed POST (architecture §2). */
@@ -35,5 +34,5 @@ export async function POST(request: Request): Promise<Response> {
   if (interaction.type === InteractionType.ApplicationCommand) {
     return Response.json(await routeCommand(interaction, ctx))
   }
-  return Response.json({ error: 'unsupported interaction type' }, { status: 400 })
+  return Response.json(await routeModal(interaction, ctx))
 }
