@@ -52,23 +52,32 @@ Once:
 1. Create a free account at [vercel.com/signup](https://vercel.com/signup)
    with **Continue with GitHub**. The free (Hobby) plan is enough.
 2. Install the command-line tool inside Ubuntu and log in:
+
    ```bash
-   npm install -g vercel
+   pnpm setup          # once: a folder for global tools, added to PATH in ~/.bashrc
+   ```
+
+   **Close the terminal and open it again** (like after nvm), then:
+
+   ```bash
+   pnpm add -g vercel
    vercel --version
    vercel login
    vercel whoami
    ```
-   - `npm install -g`, not `pnpm add -g`: `pnpm`'s global folder needs a one-time
-     `pnpm setup` first, and the "never `npm i -g pnpm`" rule from the machine
-     setup is about pnpm itself, not about other tools. With Node from nvm the
-     global install lands in your home folder, no `sudo`.
-   - ✅ `vercel --version` prints `Vercel CLI 62.x` (or newer). `command not
-found`? Close the terminal and open it again.
+
+   - `pnpm add -g` is the project's way (pnpm everywhere). Without the one-time
+     `pnpm setup` it stops with `… is not in PATH. Run "pnpm setup"`: that is
+     the message, not an error in the package.
+   - ✅ `pnpm add -g vercel` ends with `+ vercel 62.x` and `Done in …`;
+     `vercel --version` prints `Vercel CLI 62.x` (or newer). `command not
+found`? The terminal was not reopened after `pnpm setup`.
    - `vercel login` asks how to log in: choose **Continue with GitHub**, the
      browser opens, confirm. No Vercel account yet? It is created right there,
      on the free Hobby plan.
    - ✅ `vercel whoami` prints your username. If it says you are not logged in,
      the browser step did not finish: run `vercel login` again.
+
 3. In the project folder, create your Vercel project and give it your five
    settings from `.env.local` (one command per variable; paste the value when
    asked, nothing is shown while pasting):
