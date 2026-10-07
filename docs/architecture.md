@@ -175,3 +175,17 @@ Decide each in its issue, and explain the choice in the pull request:
 | The database disappears                         | It is a Turso service, not a file on the server. Turso keeps one day of point-in-time restore; `/eksport` is the long-term copy. |
 | The reminder fires at the wrong hour            | The schedule in `vercel.json` is UTC: 15:00 in Warsaw is 13:00 UTC in summer time and 14:00 UTC after 25 October.                |
 | The bot token leaks                             | Server side only, never with `NEXT_PUBLIC_`. If it leaks, reset it in the Developer Portal and tell your mentor.                 |
+
+## 8. What changed on the way, and why
+
+| Where     | Was                                              | Is                                                                          | Why                                                                                                    |
+| --------- | ------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| D5        | SQLite file with `better-sqlite3`, Docker volume | Turso through `@libsql/client`, a local file in development                 | Vercel's file system does not survive a deploy; one client covers file, Turso and `:memory:` (#1, #14) |
+| D9        | external scheduler, `POST` with `CRON_SECRET`    | Vercel Cron, `GET`, `Authorization: Bearer` added by Vercel                 | no server to run cron on; the Hobby plan's daily run is enough for 15:00 (#1, #32)                     |
+| D12 (new) | own server, Docker                               | Vercel from `main`, previews per pull request, own deployment per developer | nothing to maintain; a stable URL per developer replaces a tunnel (#1, #4)                             |
+| D13 (new) | bot token + `DISCORD_REPORT_CHANNEL_ID`          | the channel's webhook                                                       | one setting, one channel, no token permissions (#32)                                                   |
+| §6.2      | open                                             | hours as `7`, `7.5`, `7,5`, `7 h`; 0,25–16; texts up to 1000                | decided in #17                                                                                         |
+| §6.3      | open                                             | Markdown, every working day visible                                         | decided in #27 without the school's template; reversible                                               |
+| #24       | after the handlers                               | before them                                                                 | the texts in one file first means no refactor later                                                    |
+| #31       | open                                             | 7 days back, older ones by the mentor                                       | a diary rewritten weeks later is not a daily log                                                       |
+| #34       | Dockerfile                                       | closed                                                                      | no Docker on Vercel                                                                                    |

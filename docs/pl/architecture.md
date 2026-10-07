@@ -188,3 +188,17 @@ Każdą podejmijcie w jej zadaniu i wyjaśnijcie wybór w pull requeście:
 | Baza znika                                 | To usługa Turso, nie plik na serwerze. Turso trzyma jeden dzień przywracania w czasie; `/eksport` to kopia na dłużej.  |
 | Przypomnienie przychodzi o złej godzinie   | Harmonogram w `vercel.json` jest w UTC: 15:00 w Warszawie to 13:00 UTC w czasie letnim i 14:00 UTC po 25 października. |
 | Wycieka token bota                         | Tylko po stronie serwera, nigdy z `NEXT_PUBLIC_`. Jeśli wyciekł, zresetuj go w Developer Portal i powiedz opiekunowi.  |
+
+## 8. Co zmieniło się po drodze i dlaczego
+
+| Gdzie      | Było                                            | Jest                                                              | Dlaczego                                                                                              |
+| ---------- | ----------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| D5         | plik SQLite z `better-sqlite3`, wolumen Dockera | Turso przez `@libsql/client`, lokalnie plik                       | system plików Vercela nie przeżywa deployu; jeden klient obsługuje plik, Turso i `:memory:` (#1, #14) |
+| D9         | zewnętrzny harmonogram, `POST` z `CRON_SECRET`  | Vercel Cron, `GET`, `Authorization: Bearer` dodawany przez Vercel | nie ma serwera na crona; dzienne uruchomienie z planu Hobby wystarcza na 15:00 (#1, #32)              |
+| D12 (nowa) | własny serwer, Docker                           | Vercel z `main`, podglądy na PR, własny deploy na dewelopera      | nic do utrzymania; stały adres na dewelopera zastępuje tunel (#1, #4)                                 |
+| D13 (nowa) | token bota + `DISCORD_REPORT_CHANNEL_ID`        | webhook kanału                                                    | jedno ustawienie, jeden kanał, bez uprawnień tokenu (#32)                                             |
+| §6.2       | otwarte                                         | godziny jako `7`, `7.5`, `7,5`, `7 h`; 0,25–16; teksty do 1000    | ustalone w #17                                                                                        |
+| §6.3       | otwarte                                         | Markdown, każdy dzień roboczy widoczny                            | ustalone w #27 bez wzoru ze szkoły; odwracalne                                                        |
+| #24        | po handlerach                                   | przed nimi                                                        | teksty w jednym pliku najpierw znaczy brak refaktoru później                                          |
+| #31        | otwarte                                         | 7 dni wstecz, starsze przez opiekuna                              | dziennik przepisany po tygodniach to nie dziennik                                                     |
+| #34        | Dockerfile                                      | zamknięte                                                         | bez Dockera na Vercelu                                                                                |

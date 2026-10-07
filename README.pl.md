@@ -46,6 +46,32 @@ Kolejne polecenia pojawią się razem z zadaniami, które je dodają
 (`register-commands`, `db:migrate`, …). Każde z tych zadań dopisuje swoją
 linię do tej tabeli.
 
+## Komendy na Discordzie
+
+| Komenda                    | Co robi                                                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `/raport`                  | otwiera formularz raportu za dziś: co zrobiłem, godziny, problemy, plan; drugi tego samego dnia zastępuje pierwszy |
+| `/raport dzien:2026-10-06` | to samo za jeden z ostatnich 7 dni                                                                                 |
+| `/moje-raporty`            | Twoje ostatnie 7 raportów, widzisz je tylko Ty                                                                     |
+| `/postep`                  | Twoje godziny w stosunku do 140 h praktyk, z paskiem postępu                                                       |
+| `/eksport [od] [do]`       | Twój dziennik jako plik Markdown, domyślnie całe praktyki                                                          |
+| `/ping`                    | czy bot żyje                                                                                                       |
+
+Odpowiedzi widzisz tylko Ty. Jedyna publiczna wiadomość to przypomnienie o
+15:00 w dni robocze, wymieniające tych, którzy jeszcze nie wysłali raportu.
+
+## Znane ograniczenia
+
+- Jeden serwer, jeden zespół: `DISCORD_GUILD_ID` i `REPORT_TEAM_USER_IDS` to
+  pojedyncze wartości; drugi zespół to drugi deploy.
+- Godzina przypomnienia jest w UTC w `vercel.json` i trzeba ją zmienić ręcznie
+  przy zmianie czasu (patrz `docs/pl/deploy.md`).
+- Raporty starsze niż 7 dni zmienia tylko opiekun (`pnpm db:restore`
+  poprawionej kopii albo bezpośrednio w Turso).
+- Eksport to Markdown; wzór ze szkoły, jeśli przyjdzie, wymaga nowego
+  eksportera obok `src/export/markdown.ts`.
+- Bez strony WWW: dziennik czyta się przez `/eksport` (decyzja w #38).
+
 ## Praca we dwóch
 
 Praca jest podzielona na **dwa tory**, żeby nikt nie czekał na drugiego:
