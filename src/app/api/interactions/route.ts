@@ -3,10 +3,7 @@ import type { Context } from '@/discord/context'
 import { routeCommand, routeModal } from '@/discord/router'
 import { type Interaction, InteractionResponseType, InteractionType } from '@/discord/types'
 import { verifySignature } from '@/discord/verify'
-import { MemoryReportRepository } from '@/reports/memory-repository'
-
-// Until #20 wires the SQLite repository, the app keeps reports in memory.
-const reports = new MemoryReportRepository()
+import { getReportRepository } from '@/reports/repository'
 
 /** Discord sends every interaction here as a signed POST (architecture §2). */
 export async function POST(request: Request): Promise<Response> {
@@ -26,7 +23,8 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const interaction = JSON.parse(body) as Interaction
-  const ctx: Context = { reports, now: () => new Date() }
+  // The only place that knows which repository the app uses (#20).
+  const ctx: Context = { reports: getReportRepository(), now: () => new Date() }
 
   if (interaction.type === InteractionType.Ping) {
     return Response.json({ type: InteractionResponseType.Pong })
