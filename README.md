@@ -44,6 +44,32 @@ pnpm dev
 More commands come with the issues that add them (`register-commands`,
 `db:migrate`, …). Each of those issues adds its line to this table.
 
+## Commands in Discord
+
+| Command                    | Does                                                                                                             |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `/raport`                  | opens the report form for today: what I did, hours, problems, plan; a second one the same day replaces the first |
+| `/raport dzien:2026-10-06` | the same for one of the last 7 days                                                                              |
+| `/moje-raporty`            | your last 7 reports, only you see them                                                                           |
+| `/postep`                  | your hours against the 140-hour internship, with a progress bar                                                  |
+| `/eksport [od] [do]`       | your diary as a Markdown file, default the whole internship                                                      |
+| `/ping`                    | is the bot alive                                                                                                 |
+
+Replies are visible only to you. The one public message is the reminder at
+15:00 on working days, naming who has not reported yet.
+
+## Known limitations
+
+- One server, one team: `DISCORD_GUILD_ID` and `REPORT_TEAM_USER_IDS` are
+  single values; a second team needs a second deployment.
+- The reminder hour is UTC in `vercel.json` and must be changed by hand when
+  the clocks change (see `docs/deploy.md`).
+- Reports older than 7 days can only be changed by the mentor
+  (`pnpm db:restore` of an edited backup, or directly in Turso).
+- The export is Markdown; the school's own template, if one arrives, needs a
+  new exporter next to `src/export/markdown.ts`.
+- No web page: the diary is read through `/eksport` (decision in #38).
+
 ## Working as a team of two
 
 The work is split into **two tracks**, so neither of you waits for the other:
