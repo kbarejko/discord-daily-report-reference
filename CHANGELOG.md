@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Added
 
+- Reports are stored in the database through the same contract the tests use.
 - The database layer: Drizzle with libSQL, `pnpm db:generate` and `pnpm db:migrate`.
 - /ping answers "pong" with the response time, visible only to you.
 - The bot answers Discord's PING at /api/interactions and rejects unsigned requests.
