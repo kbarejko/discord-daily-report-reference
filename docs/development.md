@@ -1,5 +1,7 @@
 # Local development
 
+🇵🇱 [Wersja polska](pl/development.md)
+
 Each of you runs your **own** Discord application against your **own** test
 server (decision D11). Discord sends interactions to the URL set in your app,
 so with one shared app the two of you would steal each other's requests.
@@ -75,10 +77,11 @@ succeeds once your endpoint answers PING and rejects bad signatures (milestone
 Logs of the deployed bot: `vercel logs https://dv-bot-dev-<your-name>.vercel.app`
 or the **Logs** tab on vercel.com. A handler that throws shows up there.
 
-> **Why not a tunnel to the laptop?** It works too (`cloudflared tunnel --url
-http://localhost:3000`), but the address changes on every restart and it is
-> one more tool to run. A deploy costs a minute; the logic is tested locally
-> with vitest, so you go to Discord only when the logic already works.
+> **Why not a tunnel to the laptop?** It works too
+> (`cloudflared tunnel --url http://localhost:3000`), but the address changes
+> on every restart and it is one more tool to run. A deploy costs a minute;
+> the logic is tested locally with vitest, so you go to Discord only when the
+> logic already works.
 
 ## 4. Commands
 
