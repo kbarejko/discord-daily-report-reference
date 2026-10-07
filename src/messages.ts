@@ -48,6 +48,15 @@ export const messages = {
           : 'Praktyki się skończyły.',
     ].join('\n'),
 
+  export: {
+    thinking: 'Przygotowuję plik…',
+    ready: (from: string, to: string, count: number) =>
+      `Dziennik za ${from} – ${to}: ${count} ${count === 1 ? 'raport' : count >= 2 && count <= 4 ? 'raporty' : 'raportów'}.`,
+    empty: (from: string, to: string) =>
+      `Brak raportów za ${from} – ${to}. Plik zawiera same puste dni.`,
+    badRange: 'Daty podaj jako RRRR-MM-DD, „od” nie później niż „do”.',
+  },
+
   myReports: {
     title: 'Twoje ostatnie raporty',
     empty: 'Nie masz jeszcze żadnego raportu. Wpisz /raport, żeby dodać dzisiejszy.',
