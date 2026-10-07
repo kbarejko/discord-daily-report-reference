@@ -13,7 +13,9 @@
     "prepare": "husky",
     "register-commands": "tsx --env-file=.env.local scripts/register-commands.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx --env-file=.env.local scripts/migrate.ts"
+    "db:migrate": "tsx --env-file=.env.local scripts/migrate.ts",
+    "db:backup": "tsx --env-file=.env.local scripts/backup.ts",
+    "db:restore": "tsx --env-file=.env.local scripts/restore.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
