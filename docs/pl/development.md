@@ -55,10 +55,22 @@ Raz:
 2. Zainstaluj narzędzie w terminalu Ubuntu i zaloguj się:
    ```bash
    npm install -g vercel
+   vercel --version
    vercel login
+   vercel whoami
    ```
-   Wybierz **Continue with GitHub** i potwierdź w przeglądarce.
-   `vercel whoami` wypisze potem Twoją nazwę.
+   - `npm install -g`, nie `pnpm add -g`: globalny folder `pnpm` wymaga
+     najpierw jednorazowego `pnpm setup`, a zasada „nigdy `npm i -g pnpm`” z
+     przygotowania komputera dotyczy samego pnpm, nie innych narzędzi. Z Node
+     z nvm globalna instalacja ląduje w Twoim folderze domowym, bez `sudo`.
+   - ✅ `vercel --version` wypisuje `Vercel CLI 62.x` (albo nowszy). `command
+not found`? Zamknij terminal i otwórz go ponownie.
+   - `vercel login` pyta, jak się zalogować: wybierz **Continue with GitHub**,
+     otworzy się przeglądarka, potwierdź. Nie masz jeszcze konta Vercel?
+     Założy się właśnie tam, na darmowym planie Hobby.
+   - ✅ `vercel whoami` wypisuje Twoją nazwę. Jeśli mówi, że nie jesteś
+     zalogowany, krok w przeglądarce się nie dokończył: `vercel login` jeszcze
+     raz.
 3. W folderze projektu utwórz swój projekt na Vercelu i daj mu pięć ustawień
    z `.env.local` (jedno polecenie na zmienną; wklej wartość, gdy zapyta,
    podczas wklejania nic się nie wyświetla):
