@@ -1,6 +1,7 @@
 import type { Context } from '@/discord/context'
 import { mojeRaporty } from '@/discord/commands/moje-raporty'
 import { ping } from '@/discord/commands/ping'
+import { postep } from '@/discord/commands/postep'
 import { RAPORT_MODAL, raport, saveRaport } from '@/discord/commands/raport'
 import {
   type ApplicationCommandInteraction,
@@ -25,6 +26,7 @@ const commands: Record<string, CommandHandler> = {
   ping,
   raport,
   'moje-raporty': mojeRaporty,
+  postep,
 }
 
 /** Modal custom_id → the function that handles the submitted form. */
