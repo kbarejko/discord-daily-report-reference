@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Added
 
+- /eksport sends your internship diary as a Markdown file for a date range (default: the whole internship).
 - /postep shows your hours against the 140-hour internship, with a progress bar.
 - A failure inside the bot answers with a short message instead of silence; the details go to the server log.
 - /moje-raporty shows your last 7 reports, only to you.

@@ -24,7 +24,7 @@ export type ApplicationCommandInteraction = {
   type: typeof InteractionType.ApplicationCommand
   id: string
   token: string
-  data: { name: string }
+  data: { name: string; options?: Array<{ name: string; value: string | number | boolean }> }
   /** Present on a server; `user` is present in direct messages. */
   member?: { user: DiscordUser }
   user?: DiscordUser
@@ -84,6 +84,15 @@ export type ModalResponse = {
 
 export type InteractionResponse =
   { type: typeof InteractionResponseType.Pong } | MessageResponse | ModalResponse
+
+/** The value of a command option, if the user gave it. */
+export function optionOf(
+  interaction: ApplicationCommandInteraction,
+  name: string,
+): string | undefined {
+  const option = interaction.data.options?.find((o) => o.name === name)
+  return option === undefined ? undefined : String(option.value)
+}
 
 /** The user behind an interaction, whether it came from a server or a DM. */
 export function userOf(

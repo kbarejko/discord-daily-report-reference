@@ -1,3 +1,4 @@
+import type { FollowUp } from '@/discord/client'
 import type { Context } from '@/discord/context'
 import {
   type ApplicationCommandInteraction,
@@ -33,7 +34,29 @@ export function modal(customId: string, fields: Record<string, string>): ModalSu
   }
 }
 
-/** A context on an in-memory repository, with time pinned to 2026-10-07 14:00 in Warsaw. */
-export function testContext(): Context {
-  return { reports: new MemoryReportRepository(), now: () => new Date('2026-10-07T12:00:00Z') }
+export type TestContext = Context & {
+  /** Every follow-up the fake Discord client received. */
+  sent: Array<{ applicationId: string; token: string; message: FollowUp }>
+  /** Runs the work handlers deferred with `ctx.defer`, in order. */
+  flushDeferred: () => Promise<void>
+}
+
+/** A context on an in-memory repository, a fake Discord, and time pinned to 2026-10-07 14:00 in Warsaw. */
+export function testContext(): TestContext {
+  const sent: TestContext['sent'] = []
+  const deferred: Array<() => Promise<void>> = []
+  return {
+    reports: new MemoryReportRepository(),
+    applicationId: 'app',
+    now: () => new Date('2026-10-07T12:00:00Z'),
+    discord: {
+      followUp: async (applicationId, token, message) =>
+        void sent.push({ applicationId, token, message }),
+    },
+    defer: (work) => void deferred.push(work),
+    sent,
+    flushDeferred: async () => {
+      while (deferred.length) await deferred.shift()!()
+    },
+  }
 }

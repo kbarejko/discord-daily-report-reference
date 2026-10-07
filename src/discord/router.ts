@@ -1,4 +1,5 @@
 import type { Context } from '@/discord/context'
+import { eksport } from '@/discord/commands/eksport'
 import { mojeRaporty } from '@/discord/commands/moje-raporty'
 import { ping } from '@/discord/commands/ping'
 import { postep } from '@/discord/commands/postep'
@@ -27,6 +28,7 @@ const commands: Record<string, CommandHandler> = {
   raport,
   'moje-raporty': mojeRaporty,
   postep,
+  eksport,
 }
 
 /** Modal custom_id → the function that handles the submitted form. */
