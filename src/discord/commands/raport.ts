@@ -4,6 +4,7 @@ import {
   ComponentType,
   type InteractionResponse,
   InteractionResponseType,
+  type ModalSubmitInteraction,
   MessageFlags,
   type TextInput,
   TextInputStyle,
@@ -11,7 +12,7 @@ import {
 } from '@/discord/types'
 import { messages } from '@/messages'
 import { dayOf } from '@/reports/day'
-import { limits } from '@/reports/validate'
+import { limits, validateReport } from '@/reports/validate'
 
 export const RAPORT_MODAL = 'raport'
 
@@ -73,5 +74,50 @@ export async function raport(
         }),
       ],
     },
+  }
+}
+
+/** Reads the submitted fields by custom_id, never by position. */
+export function fieldsOf(interaction: ModalSubmitInteraction): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const row of interaction.data.components)
+    for (const c of row.components) out[c.custom_id] = c.value
+  return out
+}
+
+/** The submitted form: validate, save, confirm; or list what to fix and save nothing. */
+export async function saveRaport(
+  interaction: ModalSubmitInteraction,
+  ctx: Context,
+): Promise<InteractionResponse> {
+  const fields = fieldsOf(interaction)
+  const result = validateReport({
+    done: fields.done ?? '',
+    hours: fields.hours ?? '',
+    problems: fields.problems,
+    plan: fields.plan,
+  })
+  if (!result.ok) {
+    return {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: {
+        content: [messages.notSaved, ...result.errors.map((e) => `• ${e}`)].join('\n'),
+        flags: MessageFlags.Ephemeral,
+      },
+    }
+  }
+  const day = dayOf(ctx.now())
+  const userId = userOf(interaction).id
+  const replaced = (await ctx.reports.findByUserAndDay(userId, day)) !== null
+  const saved = await ctx.reports.upsert({ discordUserId: userId, day, ...result.value })
+  const lines = [
+    messages.saved(saved.day, saved.hours),
+    replaced ? messages.savedReplaced : null,
+    '',
+    saved.done,
+  ]
+  return {
+    type: InteractionResponseType.ChannelMessageWithSource,
+    data: { content: lines.filter((l) => l !== null).join('\n'), flags: MessageFlags.Ephemeral },
   }
 }
