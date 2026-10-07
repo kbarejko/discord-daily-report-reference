@@ -1,5 +1,7 @@
 # Architecture (HLD)
 
+🇵🇱 [Wersja polska](pl/architecture.md)
+
 A Discord bot that collects one short work report per person per day and
 exports them for the internship diary. It runs as a **Next.js app**: Discord
 calls one HTTP endpoint, the app checks the request, saves the report in
