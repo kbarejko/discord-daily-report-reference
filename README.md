@@ -12,6 +12,7 @@ by the team after you leave.
 
 - **How it works and what is already decided:** [docs/architecture.md](docs/architecture.md). Read it first.
 - **Running it on your machine:** [docs/development.md](docs/development.md).
+- **Production on Vercel:** [docs/deploy.md](docs/deploy.md).
 - **The team process** (branches, commits, CHANGELOG, review) is the same as in
   [intern-playground](https://github.com/DigitalVantage/intern-playground#how-we-work).
 
