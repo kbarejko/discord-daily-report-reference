@@ -24,27 +24,61 @@ it in `.env.local` as `DISCORD_GUILD_ID`.
    permission _Send Messages_. Open the generated URL and add the bot to your
    test server.
 
-## 3. A public URL for your laptop
+## 3. A public URL for your bot: your own Vercel deployment
 
-Discord has to reach `localhost:3000`, so you need a tunnel:
+Discord cannot call `localhost:3000`, so your bot needs a public address. Each
+of you deploys **your own copy** of the app to a free Vercel account (D12).
+The address stays the same, so you enter it in the Developer Portal once.
+
+Once:
+
+1. Create a free account at [vercel.com/signup](https://vercel.com/signup)
+   with **Continue with GitHub**. The free (Hobby) plan is enough.
+2. Install the command-line tool inside Ubuntu and log in:
+   ```bash
+   npm install -g vercel
+   vercel login
+   ```
+   Pick **Continue with GitHub** and confirm in the browser.
+   `vercel whoami` then prints your username.
+3. In the project folder, create your Vercel project and give it your five
+   settings from `.env.local` (one command per variable; paste the value when
+   asked, nothing is shown while pasting):
+   ```bash
+   cd ~/projects/discord-daily-report
+   vercel link            # Set up? Y → your account → Link to existing project? N → name: dv-bot-dev-<your-name>
+   vercel env add DISCORD_APPLICATION_ID production
+   vercel env add DISCORD_PUBLIC_KEY production
+   vercel env add DISCORD_BOT_TOKEN production
+   vercel env add DISCORD_GUILD_ID production
+   vercel env add CRON_SECRET production
+   ```
+   `vercel link` creates a `.vercel/` folder and adds it to `.gitignore`. It
+   holds only project ids, but keep it out of commits anyway.
+
+Every time you want Discord to see your current code:
 
 ```bash
-# once: install cloudflared (no account needed for quick tunnels)
-curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o /tmp/cloudflared.deb
-sudo apt install /tmp/cloudflared.deb
-
-# every session, in a second terminal next to `pnpm dev`
-cloudflared tunnel --url http://localhost:3000
+pnpm test --run && pnpm build    # catch errors here, not after the deploy
+vercel --prod
 ```
 
-It prints a URL like `https://random-words.trycloudflare.com`. In the Developer
-Portal → _General Information_ → **Interactions Endpoint URL** enter
-`<that URL>/api/interactions` and save. Discord sends a test request with a bad
-signature first. The save only succeeds once your endpoint answers PING and
-rejects bad signatures (milestone 1). Until then the field will not save, and
-that is expected.
+✅ The last line is `Production: https://dv-bot-dev-<your-name>.vercel.app`.
+That is your bot's address. The deploy takes about a minute.
 
-The quick-tunnel URL changes on every restart, so update the field each time.
+In the Developer Portal → _General Information_ → **Interactions Endpoint
+URL** enter `https://dv-bot-dev-<your-name>.vercel.app/api/interactions` and
+save. Discord sends a test request with a bad signature first. The save only
+succeeds once your endpoint answers PING and rejects bad signatures (milestone
+1). Until then the field will not save, and that is expected.
+
+Logs of the deployed bot: `vercel logs https://dv-bot-dev-<your-name>.vercel.app`
+or the **Logs** tab on vercel.com. A handler that throws shows up there.
+
+> **Why not a tunnel to the laptop?** It works too (`cloudflared tunnel --url
+http://localhost:3000`), but the address changes on every restart and it is
+> one more tool to run. A deploy costs a minute; the logic is tested locally
+> with vitest, so you go to Discord only when the logic already works.
 
 ## 4. Commands
 
@@ -59,10 +93,12 @@ press `Ctrl+R` in Discord.
 
 ## 5. When something does not work
 
-| Symptom                             | Usually                                                                              |
-| ----------------------------------- | ------------------------------------------------------------------------------------ |
-| "The application did not respond"   | Your handler threw or took more than 3 s. Look at the `pnpm dev` terminal.           |
-| The Endpoint URL will not save      | The tunnel is down, the path is wrong, or the signature check fails.                 |
-| `401` on every request              | `DISCORD_PUBLIC_KEY` is from a different application.                                |
-| The command is not in the list      | Not registered on this server (`pnpm register-commands`), or Discord needs `Ctrl+R`. |
-| Changes in `.env.local` are ignored | Restart `pnpm dev`.                                                                  |
+| Symptom                              | Usually                                                                                                     |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| "The application did not respond"    | Your handler threw or took more than 3 s. Look at `vercel logs` (or the `pnpm dev` terminal with a tunnel). |
+| The Endpoint URL will not save       | You changed code but did not run `vercel --prod`, the path is wrong, or the signature check fails.          |
+| Discord still sees the old behaviour | Run `vercel --prod` again and wait for `Production:` before trying.                                         |
+| `vercel --prod` fails in the build   | Run `pnpm build` locally and read the first error. The deployed build has the same code.                    |
+| `401` on every request               | `DISCORD_PUBLIC_KEY` is from a different application.                                                       |
+| The command is not in the list       | Not registered on this server (`pnpm register-commands`), or Discord needs `Ctrl+R`.                        |
+| Changes in `.env.local` are ignored  | Restart `pnpm dev`.                                                                                         |
