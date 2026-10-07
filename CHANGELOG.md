@@ -5,6 +5,10 @@ same pull request as the code.
 
 ## [Unreleased]
 
+### Fixed
+
+- An empty `DATABASE_AUTH_TOKEN=` line in `.env.local` is accepted again (it was in #6, lost in #32).
+
 ### Added
 
 - `GET /api/health` answers `{ ok: true }` when the app can reach its database.

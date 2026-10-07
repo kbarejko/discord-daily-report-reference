@@ -32,6 +32,10 @@ describe('parseEnv', () => {
     expect(parseEnv(valid).REPORT_TEAM_USER_IDS).toEqual([])
   })
 
+  it('accepts an empty optional variable, as .env.example ships it', () => {
+    expect(parseEnv({ ...valid, DATABASE_AUTH_TOKEN: '' }).DATABASE_AUTH_TOKEN).toBeUndefined()
+  })
+
   it('treats an empty string as missing', () => {
     expect(() => parseEnv({ ...valid, DISCORD_BOT_TOKEN: '' })).toThrow('DISCORD_BOT_TOKEN')
   })

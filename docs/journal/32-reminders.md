@@ -27,3 +27,15 @@ one setting instead of two.
 - The `Headers` API trims values. A test with a trailing space tested
   nothing.
   🇵🇱 _`Headers` przycina wartości. Test ze spacją na końcu niczego nie testował._
+
+## Regression, found in #36 🇵🇱 Regresja, znaleziona w #36
+
+```text
+    throw new Error(`Missing or empty environment variables: ${names}`)
+Error: Missing or empty environment variables: DATABASE_AUTH_TOKEN
+```
+
+This pull request rewrote `src/env.ts` from an older copy without the #6 fix
+and dropped the test for it. Restored in the `fix(env)` pull request. The
+lesson is in the issue comment: diff against `main`, and never drop a test
+silently.
