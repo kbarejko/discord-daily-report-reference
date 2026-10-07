@@ -44,16 +44,42 @@ export type ModalSubmitInteraction = {
 
 export type Interaction = PingInteraction | ApplicationCommandInteraction | ModalSubmitInteraction
 
+export type Embed = {
+  title?: string
+  description?: string
+  fields?: Array<{ name: string; value: string; inline?: boolean }>
+}
+
 export type MessageResponse = {
   type:
     | typeof InteractionResponseType.ChannelMessageWithSource
     | typeof InteractionResponseType.DeferredChannelMessageWithSource
-  data?: { content?: string; flags?: number }
+  data?: { content?: string; flags?: number; embeds?: Embed[] }
+}
+
+/** Component types and text input styles used in modals. */
+export const ComponentType = { ActionRow: 1, TextInput: 4 } as const
+export const TextInputStyle = { Short: 1, Paragraph: 2 } as const
+
+export type TextInput = {
+  type: typeof ComponentType.TextInput
+  custom_id: string
+  label: string
+  style: (typeof TextInputStyle)[keyof typeof TextInputStyle]
+  required?: boolean
+  min_length?: number
+  max_length?: number
+  placeholder?: string
+  value?: string
 }
 
 export type ModalResponse = {
   type: typeof InteractionResponseType.Modal
-  data: { custom_id: string; title: string; components: unknown[] }
+  data: {
+    custom_id: string
+    title: string
+    components: Array<{ type: typeof ComponentType.ActionRow; components: [TextInput] }>
+  }
 }
 
 export type InteractionResponse =
