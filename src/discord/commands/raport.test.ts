@@ -9,7 +9,7 @@ describe('/raport', () => {
   it('opens a modal with the four fields, done and hours required', async () => {
     const response = (await raport(command('raport'), testContext())) as ModalResponse
     expect(response.type).toBe(9)
-    expect(response.data.custom_id).toBe(RAPORT_MODAL)
+    expect(response.data.custom_id).toBe(`${RAPORT_MODAL}:2026-10-07`)
     expect(response.data.title).toBe('Raport za 2026-10-07')
     const inputs = response.data.components.map((row) => row.components[0])
     expect(inputs.map((i) => i.custom_id)).toEqual(['done', 'hours', 'problems', 'plan'])

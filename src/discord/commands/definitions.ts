@@ -3,7 +3,20 @@ const STRING = 3 // ApplicationCommandOptionType.String
 
 export const commandDefinitions = [
   { name: 'ping', description: 'Sprawdza, czy bot odpowiada' },
-  { name: 'raport', description: 'Dodaje lub poprawia dzisiejszy raport z pracy' },
+  {
+    name: 'raport',
+    description: 'Dodaje lub poprawia raport z pracy (dziś albo z ostatnich 7 dni)',
+    options: [
+      {
+        type: STRING,
+        name: 'dzien',
+        description: 'Dzień raportu, RRRR-MM-DD (domyślnie dziś)',
+        required: false,
+        min_length: 10,
+        max_length: 10,
+      },
+    ],
+  },
   { name: 'moje-raporty', description: 'Pokazuje Twoje ostatnie raporty (tylko Tobie)' },
   { name: 'postep', description: 'Twoje godziny w stosunku do 140 h praktyk' },
   {
