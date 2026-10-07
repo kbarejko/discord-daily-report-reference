@@ -5,6 +5,7 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from '@/discord/types'
+import { messages } from '@/messages'
 
 type CommandHandler = (
   interaction: ApplicationCommandInteraction,
@@ -23,7 +24,7 @@ export async function routeCommand(
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: {
-        content: `Nie znam komendy /${interaction.data.name}.`,
+        content: messages.unknownCommand(interaction.data.name),
         flags: MessageFlags.Ephemeral,
       },
     }
