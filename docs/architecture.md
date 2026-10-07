@@ -3,7 +3,8 @@
 A Discord bot that collects one short work report per person per day and
 exports them for the internship diary. It runs as a **Next.js app**: Discord
 calls one HTTP endpoint, the app checks the request, saves the report in
-SQLite and answers. No server process stays connected to Discord.
+the database and answers. No server process stays connected to Discord. It
+runs on Vercel, with the database in Turso (D5, D12).
 
 This document fixes the decisions that are expensive to get wrong (§4). The
 ones left open (§6) are yours: make them in a pull request and write down why.
@@ -20,7 +21,7 @@ ones left open (§6) are yours: make them in a pull request and write down why.
   diary.
 - A reminder in the channel at 15:00 on working days for whoever has not
   reported yet.
-- Deployed on our server, with the database on a persistent volume.
+- Deployed on Vercel from `main`, with the database in Turso.
 
 **Out:** a web dashboard (a stretch issue), multiple teams or servers, editing
 reports from the web, attachments, AI summaries.
@@ -118,19 +119,20 @@ interface ReportRepository {
 
 ## 4. Decisions already made
 
-| #   | Decision                                                                                               | Why                                                                                                                                                   |
-| --- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | **Interactions over HTTP**, not the gateway. No discord.js.                                            | A slash command is a POST to a URL, so a Next.js Route Handler is the whole bot. Nothing runs 24/7, and it deploys like any other app.                |
-| D2  | **Verify every request's Ed25519 signature** with Web Crypto, no SDK.                                  | Discord refuses to save the endpoint URL until it rejects a bad signature, and anyone could call the URL otherwise. Node 24 has Ed25519 built in.     |
-| D3  | **Answer in under 3 s.** Slow work: a deferred response, then edit the message.                        | Discord's hard limit. A deferred answer buys 15 minutes.                                                                                              |
-| D4  | **Commands are registered by a script** (`pnpm register-commands`), per test server in development.    | Registration is a separate API call, not something the app does at startup. Server-scoped commands update instantly, global ones up to an hour later. |
-| D5  | **SQLite through Drizzle ORM** (`better-sqlite3` driver), migrations with `drizzle-kit`. One instance. | A file is enough for two people's reports, and the schema stays in TypeScript. SQLite allows one writer, so the app runs as a single container.       |
-| D6  | **A day is a date in Europe/Warsaw**, stored as `YYYY-MM-DD` text.                                     | "Today" at 00:30 is a different date in UTC. One rule, in one function, tested at midnight.                                                           |
-| D7  | **One report per person per day.** A second `/raport` the same day replaces the first.                 | The diary has one line per day. Replacing is simpler than merging, and the form opens pre-filled.                                                     |
-| D8  | **Personal replies are ephemeral** (flag 64), visible only to the author.                              | Hours and problems are not for the whole channel. The reminder is the only public message.                                                            |
-| D9  | **Reminders come from an external scheduler** calling `POST /api/cron/reminders` with `CRON_SECRET`.   | A serverless-style app has no reliable in-process timer. Coolify's scheduled task (or any cron) calls the URL.                                        |
-| D10 | **Settings come from environment variables**, checked with zod at startup.                             | A missing key fails at start with its name, instead of as a 401 from Discord an hour later.                                                           |
-| D11 | **Every developer has their own Discord application and test server.**                                 | Discord sends every interaction to one URL. Two people sharing an app would steal each other's requests.                                              |
+| #   | Decision                                                                                                                                                                                                  | Why                                                                                                                                                                                                                                                                    |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | **Interactions over HTTP**, not the gateway. No discord.js.                                                                                                                                               | A slash command is a POST to a URL, so a Next.js Route Handler is the whole bot. Nothing runs 24/7, and it deploys like any other app.                                                                                                                                 |
+| D2  | **Verify every request's Ed25519 signature** with Web Crypto, no SDK.                                                                                                                                     | Discord refuses to save the endpoint URL until it rejects a bad signature, and anyone could call the URL otherwise. Node 24 has Ed25519 built in.                                                                                                                      |
+| D3  | **Answer in under 3 s.** Slow work: a deferred response, then edit the message.                                                                                                                           | Discord's hard limit. A deferred answer buys 15 minutes.                                                                                                                                                                                                               |
+| D4  | **Commands are registered by a script** (`pnpm register-commands`), per test server in development.                                                                                                       | Registration is a separate API call, not something the app does at startup. Server-scoped commands update instantly, global ones up to an hour later.                                                                                                                  |
+| D5  | **SQLite through Drizzle ORM** with the `@libsql/client` driver: a local file in development, a [Turso](https://turso.tech) database in production. Migrations with `drizzle-kit`.                        | A few hundred reports fit in SQLite, and the schema stays in TypeScript. The file system on Vercel does not survive a deploy, so production needs a hosted database; libSQL is SQLite as a service, and the same client opens `file:./data/reports.db` on your laptop. |
+| D6  | **A day is a date in Europe/Warsaw**, stored as `YYYY-MM-DD` text.                                                                                                                                        | "Today" at 00:30 is a different date in UTC. One rule, in one function, tested at midnight.                                                                                                                                                                            |
+| D7  | **One report per person per day.** A second `/raport` the same day replaces the first.                                                                                                                    | The diary has one line per day. Replacing is simpler than merging, and the form opens pre-filled.                                                                                                                                                                      |
+| D8  | **Personal replies are ephemeral** (flag 64), visible only to the author.                                                                                                                                 | Hours and problems are not for the whole channel. The reminder is the only public message.                                                                                                                                                                             |
+| D9  | **Reminders come from Vercel Cron** calling `GET /api/cron/reminders`; the handler checks the `Authorization: Bearer <CRON_SECRET>` header Vercel adds.                                                   | A serverless app has no in-process timer. The schedule lives in `vercel.json` (in UTC); the free plan runs it once a day, within the hour, which is enough for a 15:00 nudge.                                                                                          |
+| D10 | **Settings come from environment variables**, checked with zod at startup.                                                                                                                                | A missing key fails at start with its name, instead of as a 401 from Discord an hour later.                                                                                                                                                                            |
+| D11 | **Every developer has their own Discord application and test server.**                                                                                                                                    | Discord sends every interaction to one URL. Two people sharing an app would steal each other's requests.                                                                                                                                                               |
+| D12 | **Hosted on Vercel.** Production deploys from `main`; every pull request gets a preview URL. For Discord testing each developer deploys their own copy with the `vercel` command (`docs/development.md`). | No server to maintain, and a pull request can be tried live before merge. A stable URL per developer replaces a tunnel to the laptop.                                                                                                                                  |
 
 ## 5. Discord reference
 
@@ -163,9 +165,10 @@ Decide each in its issue, and explain the choice in the pull request:
 
 ## 7. Risks
 
-| Risk                                            | Mitigation                                                                                                       |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Discord cannot reach your laptop                | A tunnel (`docs/development.md`). Check it with the PING issue first.                                            |
-| A request takes longer than 3 s on a cold start | Keep handlers small. Defer anything that calls another API.                                                      |
-| The SQLite file is lost on redeploy             | A persistent volume on the server (deploy issue).                                                                |
-| The bot token leaks                             | Server side only, never with `NEXT_PUBLIC_`. If it leaks, reset it in the Developer Portal and tell your mentor. |
+| Risk                                            | Mitigation                                                                                                                       |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Discord cannot reach `localhost`                | Your own Vercel deployment (`docs/development.md` §3). Check it with the PING issue first.                                       |
+| A request takes longer than 3 s on a cold start | Keep handlers small. Defer anything that calls another API.                                                                      |
+| The database disappears                         | It is a Turso service, not a file on the server. Turso keeps one day of point-in-time restore; `/eksport` is the long-term copy. |
+| The reminder fires at the wrong hour            | The schedule in `vercel.json` is UTC: 15:00 in Warsaw is 13:00 UTC in summer time and 14:00 UTC after 25 October.                |
+| The bot token leaks                             | Server side only, never with `NEXT_PUBLIC_`. If it leaks, reset it in the Developer Portal and tell your mentor.                 |

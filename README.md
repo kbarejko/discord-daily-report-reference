@@ -95,4 +95,4 @@ Agree on it **together** in the first days, in one pull request.
 | **M1: The bot answers**     | 9 October  | `/ping` works end to end on both of your test servers     |
 | **M2: Reports are saved**   | 16 October | `/raport` saves to SQLite, `/moje-raporty` lists them     |
 | **M3: Export and progress** | 23 October | `/eksport` produces the diary file, `/postep` shows hours |
-| **M4: In production**       | 30 October | deployed, reminders on, the team uses it                  |
+| **M4: In production**       | 30 October | deployed on Vercel, reminders on, the team uses it        |
