@@ -3,5 +3,5 @@
 allowBuilds:
   sharp: true
   unrs-resolver: true
-  # SQLite driver chosen in docs/architecture.md (D5). It compiles a native module.
-  better-sqlite3: true
+  # Pulled in by drizzle-kit (D5). Its install script only picks the binary for this platform.
+  esbuild: true

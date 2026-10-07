@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Added
 
+- The database layer: Drizzle with libSQL, `pnpm db:generate` and `pnpm db:migrate`.
 - /ping answers "pong" with the response time, visible only to you.
 - The bot answers Discord's PING at /api/interactions and rejects unsigned requests.
 - pnpm register-commands puts the bot's commands on your test server.

@@ -26,15 +26,17 @@ cp .env.example .env.local   # then fill it in: docs/development.md
 pnpm dev
 ```
 
-| Command                  | What it does                                                             |
-| ------------------------ | ------------------------------------------------------------------------ |
-| `pnpm dev`               | dev server on http://localhost:3000                                      |
-| `pnpm lint`              | ESLint                                                                   |
-| `pnpm typecheck`         | TypeScript                                                               |
-| `pnpm test`              | Vitest, watch mode (`pnpm test --run` for once)                          |
-| `pnpm build`             | production build                                                         |
-| `pnpm format`            | Prettier                                                                 |
-| `pnpm register-commands` | sends the command list to your test server (run after a command changes) |
+| Command                  | What it does                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| `pnpm dev`               | dev server on http://localhost:3000                                                  |
+| `pnpm lint`              | ESLint                                                                               |
+| `pnpm typecheck`         | TypeScript                                                                           |
+| `pnpm test`              | Vitest, watch mode (`pnpm test --run` for once)                                      |
+| `pnpm build`             | production build                                                                     |
+| `pnpm format`            | Prettier                                                                             |
+| `pnpm register-commands` | sends the command list to your test server (run after a command changes)             |
+| `pnpm db:generate`       | writes a migration from `src/db/schema.ts` into `drizzle/` (after a schema change)   |
+| `pnpm db:migrate`        | applies the migrations to `DATABASE_URL` (once after clone, and after `db:generate`) |
 
 More commands come with the issues that add them (`register-commands`,
 `db:migrate`, …). Each of those issues adds its line to this table.
