@@ -6,6 +6,7 @@ import {
   InteractionResponseType,
   type ModalSubmitInteraction,
   MessageFlags,
+  optionOf,
   type TextInput,
   TextInputStyle,
   userOf,
@@ -15,6 +16,32 @@ import { dayOf } from '@/reports/day'
 import { limits, validateReport } from '@/reports/validate'
 
 export const RAPORT_MODAL = 'raport'
+/** A report older than this many days is the mentor's to fix (decision #31). */
+export const MAX_DAYS_BACK = 7
+const DAY = /^\d{4}-\d{2}-\d{2}$/
+
+function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T12:00:00Z`) - Date.parse(`${from}T12:00:00Z`)) / 86_400_000)
+}
+
+/** The day a report may be about: today by default, an earlier day on request, never the future or too far back. */
+export function resolveDay(
+  option: string | undefined,
+  today: string,
+): { ok: true; day: string } | { ok: false; error: string } {
+  if (option === undefined) return { ok: true, day: today }
+  if (!DAY.test(option) || Number.isNaN(Date.parse(`${option}T12:00:00Z`)))
+    return { ok: false, error: messages.raportDay.badDate }
+  if (option > today) return { ok: false, error: messages.raportDay.future(option) }
+  if (daysBetween(option, today) > MAX_DAYS_BACK)
+    return { ok: false, error: messages.raportDay.tooOld(option, MAX_DAYS_BACK) }
+  return { ok: true, day: option }
+}
+
+/** The modal's custom_id carries the day, so the submit handler knows which day it is about. */
+export function modalId(day: string): string {
+  return `${RAPORT_MODAL}:${day}`
+}
 
 function input(partial: Omit<TextInput, 'type'>): { type: 1; components: [TextInput] } {
   return {
@@ -28,13 +55,20 @@ export async function raport(
   interaction: ApplicationCommandInteraction,
   ctx: Context,
 ): Promise<InteractionResponse> {
-  const day = dayOf(ctx.now())
+  const resolved = resolveDay(optionOf(interaction, 'dzien'), dayOf(ctx.now()))
+  if (!resolved.ok) {
+    return {
+      type: InteractionResponseType.ChannelMessageWithSource,
+      data: { content: resolved.error, flags: MessageFlags.Ephemeral },
+    }
+  }
+  const day = resolved.day
   const existing = await ctx.reports.findByUserAndDay(userOf(interaction).id, day)
   const f = messages.form
   return {
     type: InteractionResponseType.Modal,
     data: {
-      custom_id: RAPORT_MODAL,
+      custom_id: modalId(day),
       title: f.title(day),
       components: [
         input({
@@ -106,7 +140,8 @@ export async function saveRaport(
       },
     }
   }
-  const day = dayOf(ctx.now())
+  // The day travels in the custom_id ("raport:2026-10-06"); a bare "raport" means today.
+  const day = interaction.data.custom_id.split(':')[1] ?? dayOf(ctx.now())
   const userId = userOf(interaction).id
   const replaced = (await ctx.reports.findByUserAndDay(userId, day)) !== null
   const saved = await ctx.reports.upsert({ discordUserId: userId, day, ...result.value })

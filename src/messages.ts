@@ -57,6 +57,14 @@ export const messages = {
     badRange: 'Daty podaj jako RRRR-MM-DD, „od” nie później niż „do”.',
   },
 
+  raportDay: {
+    future: (day: string) =>
+      `${day} jeszcze nie było. Raport można dodać za dziś albo za wcześniejszy dzień.`,
+    tooOld: (day: string, limit: number) =>
+      `${day} to więcej niż ${limit} dni temu. Starsze raporty poprawia opiekun; napisz do niego.`,
+    badDate: 'Dzień podaj jako RRRR-MM-DD, np. 2026-10-06.',
+  },
+
   myReports: {
     title: 'Twoje ostatnie raporty',
     empty: 'Nie masz jeszcze żadnego raportu. Wpisz /raport, żeby dodać dzisiejszy.',

@@ -1,7 +1,7 @@
 import type { Context } from '@/discord/context'
-import { eksport } from '@/discord/commands/eksport'
 import { mojeRaporty } from '@/discord/commands/moje-raporty'
 import { ping } from '@/discord/commands/ping'
+import { eksport } from '@/discord/commands/eksport'
 import { postep } from '@/discord/commands/postep'
 import { RAPORT_MODAL, raport, saveRaport } from '@/discord/commands/raport'
 import {
@@ -55,6 +55,8 @@ export async function routeModal(
   interaction: ModalSubmitInteraction,
   ctx: Context,
 ): Promise<InteractionResponse> {
-  const handler = modals[interaction.data.custom_id]
-  return handler ? handler(interaction, ctx) : unknown(interaction.data.custom_id)
+  // custom_id may carry a parameter after ':' ("raport:2026-10-06"); the handler is chosen by the part before it.
+  const kind = interaction.data.custom_id.split(':')[0]
+  const handler = modals[kind]
+  return handler ? handler(interaction, ctx) : unknown(kind)
 }
