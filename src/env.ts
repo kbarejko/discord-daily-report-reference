@@ -11,12 +11,20 @@ const schema = z.object({
   DISCORD_BOT_TOKEN: z.string().min(1),
   DISCORD_GUILD_ID: z.string().min(1),
   DATABASE_URL: z.string().min(1).default('file:./data/reports.db'),
-  // Optional, and .env.example ships it as an empty line: '' must count as absent.
-  DATABASE_AUTH_TOKEN: z
+  DATABASE_AUTH_TOKEN: z.string().min(1).optional(),
+  CRON_SECRET: z.string().min(1),
+  /** Webhook of the channel the 15:00 reminder is posted to (D13). */
+  REMINDER_WEBHOOK_URL: z.string().url(),
+  /** Discord user ids expected to report every working day, comma-separated. Empty: no reminders. */
+  REPORT_TEAM_USER_IDS: z
     .string()
     .optional()
-    .transform((value) => value || undefined),
-  CRON_SECRET: z.string().min(1),
+    .transform((value) =>
+      (value ?? '')
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean),
+    ),
 })
 
 export type Env = z.infer<typeof schema>
