@@ -13,8 +13,13 @@ A one-off script: generate a key pair, put the public key in the
 environment, sign a type 2 interaction for `ping`, call `POST`:
 
 ```text
-Node.js v24.16.0
+200 {"type":4,"data":{"content":"pong (0 ms)","flags":64}}
 ```
+
+The first attempt printed only `Node.js v24.16.0`: the one-off script had
+`await` at the top of the file, which `tsx -e` compiles as CommonJS. The
+same mistake as in #9, made again twenty minutes later, and pasted into this
+journal before anyone read it. Fixed by wrapping the script in `main()`.
 
 `type: 4` is CHANNEL_MESSAGE_WITH_SOURCE, `flags: 64` is "only the caller
 sees it" (D8). The number of milliseconds is the time between receiving the
