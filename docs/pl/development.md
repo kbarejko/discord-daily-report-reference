@@ -119,5 +119,6 @@ którejś brakuje, naciśnij `Ctrl+R` w Discordzie.
 | Discord dalej widzi stare zachowanie   | Uruchom `vercel --prod` jeszcze raz i poczekaj na `Production:`, zanim spróbujesz.                               |
 | `vercel --prod` wywala się na buildzie | Uruchom `pnpm build` lokalnie i przeczytaj pierwszy błąd. Wdrożony build ma ten sam kod.                         |
 | `401` na każde żądanie                 | `DISCORD_PUBLIC_KEY` jest z innej aplikacji.                                                                     |
+| `Unknown Guild` z API                  | Bota nie ma na tym serwerze: otwórz jeszcze raz link autoryzacji z sekcji 2. Identyfikator jest pewnie dobry.    |
 | Komendy nie ma na liście               | Niezarejestrowana na tym serwerze (`pnpm register-commands`) albo Discord potrzebuje `Ctrl+R`.                   |
 | Zmiany w `.env.local` są ignorowane    | Uruchom `pnpm dev` ponownie.                                                                                     |
