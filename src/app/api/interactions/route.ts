@@ -1,7 +1,7 @@
 import { getEnv } from '@/env'
 import type { Context } from '@/discord/context'
-import { routeCommand, routeModal } from '@/discord/router'
-import { type Interaction, InteractionResponseType, InteractionType } from '@/discord/types'
+import { handleInteraction } from '@/discord/handle'
+import type { Interaction } from '@/discord/types'
 import { verifySignature } from '@/discord/verify'
 import { getReportRepository } from '@/reports/repository'
 
@@ -18,19 +18,10 @@ export async function POST(request: Request): Promise<Response> {
     timestamp,
     publicKey: getEnv().DISCORD_PUBLIC_KEY,
   })
-  if (!valid) {
-    return Response.json({ error: 'invalid request signature' }, { status: 401 })
-  }
+  if (!valid) return Response.json({ error: 'invalid request signature' }, { status: 401 })
 
   const interaction = JSON.parse(body) as Interaction
   // The only place that knows which repository the app uses (#20).
   const ctx: Context = { reports: getReportRepository(), now: () => new Date() }
-
-  if (interaction.type === InteractionType.Ping) {
-    return Response.json({ type: InteractionResponseType.Pong })
-  }
-  if (interaction.type === InteractionType.ApplicationCommand) {
-    return Response.json(await routeCommand(interaction, ctx))
-  }
-  return Response.json(await routeModal(interaction, ctx))
+  return Response.json(await handleInteraction(interaction, ctx))
 }
