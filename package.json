@@ -10,7 +10,8 @@
     "test": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "register-commands": "tsx --env-file=.env.local scripts/register-commands.ts"
   },
   "dependencies": {
     "next": "16.3.8",
@@ -29,6 +30,7 @@
     "lint-staged": "^17.6.0",
     "prettier": "^3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^6",
     "vitest": "^5.0.3"
   },

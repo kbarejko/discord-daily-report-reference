@@ -27,14 +27,15 @@ cp .env.example .env.local   # potem uzupełnij: docs/pl/development.md
 pnpm dev
 ```
 
-| Polecenie        | Co robi                                                                    |
-| ---------------- | -------------------------------------------------------------------------- |
-| `pnpm dev`       | serwer deweloperski na http://localhost:3000                               |
-| `pnpm lint`      | ESLint                                                                     |
-| `pnpm typecheck` | TypeScript                                                                 |
-| `pnpm test`      | Vitest, powtarza testy po każdym zapisie (`pnpm test --run` uruchamia raz) |
-| `pnpm build`     | wersja produkcyjna                                                         |
-| `pnpm format`    | Prettier                                                                   |
+| Polecenie                | Co robi                                                                    |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `pnpm dev`               | serwer deweloperski na http://localhost:3000                               |
+| `pnpm lint`              | ESLint                                                                     |
+| `pnpm typecheck`         | TypeScript                                                                 |
+| `pnpm test`              | Vitest, powtarza testy po każdym zapisie (`pnpm test --run` uruchamia raz) |
+| `pnpm build`             | wersja produkcyjna                                                         |
+| `pnpm format`            | Prettier                                                                   |
+| `pnpm register-commands` | wysyła listę komend na Twój serwer testowy (po każdej zmianie komendy)     |
 
 Kolejne polecenia pojawią się razem z zadaniami, które je dodają
 (`register-commands`, `db:migrate`, …). Każde z tych zadań dopisuje swoją
