@@ -1,18 +1,18 @@
 name: Task
-description: A piece of work small enough for one pull request.
+description: A piece of work small enough for one pull request. 🇵🇱 Zadanie na tyle małe, że mieści się w jednym pull requeście.
 labels: [task]
 body:
   - type: textarea
     id: goal
     attributes:
-      label: Goal
-      description: What should be true when this is done?
+      label: Goal 🇵🇱 Cel
+      description: What should be true when this is done? 🇵🇱 Co ma być prawdą, gdy to będzie zrobione?
     validations:
       required: true
   - type: textarea
     id: done
     attributes:
-      label: Done when
-      description: How a reviewer checks it — a test, a screen, a command.
+      label: Done when 🇵🇱 Gotowe, gdy
+      description: How a reviewer checks it — a test, a screen, a command. 🇵🇱 Jak reviewer to sprawdzi — test, ekran, komenda.
     validations:
       required: true

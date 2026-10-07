@@ -1,5 +1,7 @@
 # Daily report bot
 
+🇵🇱 [Wersja polska](README.pl.md)
+
 A Discord bot for the Digital Vantage team. Once a day everyone types
 `/raport`, fills in a short form (what I did, hours, problems, plan) and the bot
 keeps it. At the end of the internship one command exports everything for the
@@ -83,10 +85,6 @@ Agree on it **together** in the first days, in one pull request.
   `/raport`.
 - Blocked on something only the mentor can do (keys, the server, access)?
   Say so on Discord the same day.
-
-> 🇵🇱 Codziennie: spotkanie o 12:00, praca w dzień (między 9:00 a 19:00, nigdy
-> w nocy), na koniec dnia wpis w swoim dzienniku praktyk (#40 Artem, #41
-> Mykyta). Od M2 raporty przez bota: `/raport`.
 
 ## Milestones
 
