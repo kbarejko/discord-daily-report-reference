@@ -45,3 +45,6 @@ next-env.d.ts
 /data/
 *.db
 *.db-journal
+
+# local backups (pnpm db:backup)
+backups/

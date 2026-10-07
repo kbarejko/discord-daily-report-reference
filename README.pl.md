@@ -39,6 +39,8 @@ pnpm dev
 | `pnpm register-commands` | wysyła listę komend na Twój serwer testowy (po każdej zmianie komendy)       |
 | `pnpm db:generate`       | zapisuje migrację ze `src/db/schema.ts` do `drizzle/` (po zmianie schematu)  |
 | `pnpm db:migrate`        | stosuje migracje do `DATABASE_URL` (raz po klonie i po każdym `db:generate`) |
+| `pnpm db:backup`         | zapisuje każdy raport do `backups/reports-<znacznik>.json`                   |
+| `pnpm db:restore <plik>` | wczytuje kopię z powrotem, zastępując raporty tej samej osoby i dnia         |
 
 Kolejne polecenia pojawią się razem z zadaniami, które je dodają
 (`register-commands`, `db:migrate`, …). Każde z tych zadań dopisuje swoją

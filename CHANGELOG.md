@@ -11,6 +11,7 @@ same pull request as the code.
 
 ### Added
 
+- `pnpm db:backup` and `pnpm db:restore` copy every report out of the database and back.
 - `GET /api/health` answers `{ ok: true }` when the app can reach its database.
 - A reminder at 15:00 on working days names who has not reported yet; silent when everyone has.
 - /raport dzien:RRRR-MM-DD adds or fixes a report for one of the last 7 days.
