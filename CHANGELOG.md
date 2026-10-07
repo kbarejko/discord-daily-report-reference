@@ -5,6 +5,10 @@ same pull request as the code.
 
 ## [Unreleased]
 
+### Added
+
+- One tested rule for "today" in Europe/Warsaw.
+
 ### Docs
 
 - The README, the architecture and the development guide exist in English and
