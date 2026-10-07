@@ -8,6 +8,7 @@ const valid = {
   DISCORD_BOT_TOKEN: 'token',
   DISCORD_GUILD_ID: '456',
   CRON_SECRET: 'secret',
+  REMINDER_WEBHOOK_URL: 'https://discord.com/api/webhooks/1/abc',
 }
 
 describe('parseEnv', () => {
@@ -24,8 +25,11 @@ describe('parseEnv', () => {
     )
   })
 
-  it('accepts an empty optional variable, as .env.example ships it', () => {
-    expect(parseEnv({ ...valid, DATABASE_AUTH_TOKEN: '' }).DATABASE_AUTH_TOKEN).toBeUndefined()
+  it('splits the team ids and tolerates spaces and an empty value', () => {
+    expect(parseEnv({ ...valid, REPORT_TEAM_USER_IDS: ' 1, 2 ,,3 ' }).REPORT_TEAM_USER_IDS).toEqual(
+      ['1', '2', '3'],
+    )
+    expect(parseEnv(valid).REPORT_TEAM_USER_IDS).toEqual([])
   })
 
   it('treats an empty string as missing', () => {

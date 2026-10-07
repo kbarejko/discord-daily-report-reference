@@ -14,12 +14,13 @@ beforeAll(async () => {
   ])) as CryptoKeyPair
   privateKey = pair.privateKey
   publicKey = bytesToHex(await crypto.subtle.exportKey('raw', pair.publicKey))
-  // getEnv() reads process.env the first time it is called, so set everything before the first request.
+  // The route reads env at import time, so set the key before importing it.
   vi.stubEnv('DISCORD_APPLICATION_ID', '1')
   vi.stubEnv('DISCORD_PUBLIC_KEY', publicKey)
   vi.stubEnv('DISCORD_BOT_TOKEN', 't')
   vi.stubEnv('DISCORD_GUILD_ID', '1')
   vi.stubEnv('CRON_SECRET', 's')
+  vi.stubEnv('REMINDER_WEBHOOK_URL', 'https://discord.com/api/webhooks/1/abc')
 })
 
 async function post(body: string, signed: boolean): Promise<Response> {

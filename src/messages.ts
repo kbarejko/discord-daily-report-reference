@@ -65,6 +65,10 @@ export const messages = {
     badDate: 'Dzień podaj jako RRRR-MM-DD, np. 2026-10-06.',
   },
 
+  /** Posted publicly in the channel at 15:00 on working days, naming only the people without a report (D8, D9). */
+  reminder: (today: string, mentions: string[]) =>
+    `Przypomnienie: ${mentions.join(', ')}, za ${today} nie ma jeszcze raportu. Wpisz /raport przed końcem pracy.`,
+
   myReports: {
     title: 'Twoje ostatnie raporty',
     empty: 'Nie masz jeszcze żadnego raportu. Wpisz /raport, żeby dodać dzisiejszy.',
