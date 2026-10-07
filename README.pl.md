@@ -13,6 +13,7 @@ będzie go używał po Waszym odejściu.
 - **Jak działa i co jest już ustalone:** [docs/pl/architecture.md](docs/pl/architecture.md).
   Przeczytaj najpierw.
 - **Uruchomienie na Twoim komputerze:** [docs/pl/development.md](docs/pl/development.md).
+- **Produkcja na Vercelu:** [docs/pl/deploy.md](docs/pl/deploy.md).
 - **Sposób pracy zespołu** (branche, commity, CHANGELOG, review) jest taki sam
   jak w [intern-playground](https://github.com/DigitalVantage/intern-playground/blob/main/README.pl.md#jak-pracujemy).
 
