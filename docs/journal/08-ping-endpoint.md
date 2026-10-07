@@ -49,3 +49,29 @@ expects `{"type":1}` and a 401.
 - `request.headers.get()` gives `null` for a missing header; `?? ''` turns
   it into something `verifySignature` rejects cleanly instead of crashing on.
   🇵🇱 _`request.headers.get()` daje `null` przy braku nagłówka; `?? ''` zamienia to w coś, co `verifySignature` czysto odrzuca, zamiast się wywalić._
+
+## Later the same day: the Portal says yes
+
+Saved through Discord's API instead of the browser form. `PATCH /applications/@me`
+with the bot token; Discord sends a PING and a badly signed request to the
+URL before it answers:
+
+```bash
+curl -s -X PATCH -H "Authorization: Bot $T" -H 'Content-Type: application/json' \
+  -d '{"interactions_endpoint_url":"https://dv-bot-dev-reference.vercel.app/api/interactions"}' \
+  https://discord.com/api/v10/applications/@me
+```
+
+```json
+{
+  "name": "DV Daily Report (reference)",
+  "interactions_endpoint_url": "https://dv-bot-dev-reference.vercel.app/api/interactions",
+  "message": null,
+  "code": null,
+  "errors": null
+}
+```
+
+`interactions_endpoint_url` echoed back means the deployment answered PONG
+and rejected the bad signature. The same thing the Portal's **Save Changes**
+does, without a screenshot.
