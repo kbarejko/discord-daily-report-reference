@@ -8,6 +8,7 @@ same pull request as the code.
 ### Added
 
 - One tested rule for "today" in Europe/Warsaw.
+- Settings are checked at startup; a missing one is named in the error.
 
 ### Docs
 
