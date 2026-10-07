@@ -9,6 +9,7 @@ same pull request as the code.
 
 - One tested rule for "today" in Europe/Warsaw.
 - Settings are checked at startup; a missing one is named in the error.
+- Requests that are not signed by Discord are recognised.
 
 ### Docs
 
