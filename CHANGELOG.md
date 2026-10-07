@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Added
 
+- The bot answers Discord's PING at /api/interactions and rejects unsigned requests.
 - pnpm register-commands puts the bot's commands on your test server.
 - One tested rule for "today" in Europe/Warsaw.
 - Settings are checked at startup; a missing one is named in the error.
