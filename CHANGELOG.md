@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Added
 
+- /postep shows your hours against the 140-hour internship, with a progress bar.
 - A failure inside the bot answers with a short message instead of silence; the details go to the server log.
 - /moje-raporty shows your last 7 reports, only to you.
 - /raport: a short form (what I did, hours, problems, plan) saves today's report; a second one the same day replaces the first.

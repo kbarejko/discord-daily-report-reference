@@ -28,6 +28,26 @@ export const messages = {
   savedReplaced: 'Wcześniejszy raport z tego dnia został zastąpiony.',
   notSaved: 'Raport nie został zapisany. Popraw:',
 
+  progress: (
+    bar: string,
+    p: {
+      totalHours: number
+      targetHours: number
+      workingDaysLeft: number
+      hoursPerDayNeeded: number
+      reportedDays: number
+    },
+  ) =>
+    [
+      `${bar} ${formatHours(p.totalHours).replace(' h', '')} / ${p.targetHours} h`,
+      `Raportów: ${p.reportedDays}. Dni roboczych do końca (łącznie z dziś): ${p.workingDaysLeft}.`,
+      p.hoursPerDayNeeded > 0
+        ? `Żeby dojść do ${p.targetHours} h, potrzeba ${formatHours(p.hoursPerDayNeeded)} dziennie.`
+        : p.totalHours >= p.targetHours
+          ? 'Cel osiągnięty.'
+          : 'Praktyki się skończyły.',
+    ].join('\n'),
+
   myReports: {
     title: 'Twoje ostatnie raporty',
     empty: 'Nie masz jeszcze żadnego raportu. Wpisz /raport, żeby dodać dzisiejszy.',
