@@ -39,3 +39,14 @@ This pull request rewrote `src/env.ts` from an older copy without the #6 fix
 and dropped the test for it. Restored in the `fix(env)` pull request. The
 lesson is in the issue comment: diff against `main`, and never drop a test
 silently.
+
+## On the deployment: 500 until there is a database
+
+```text
+ <- right secret 500
+```
+
+`DATABASE_URL` on the test deployment is a scratch file without tables, so
+`listUserIdsWithReport` throws and the route answers 500. That is the right
+answer for a cron run that cannot do its job (Vercel shows it as failed), and
+it goes away with Turso.

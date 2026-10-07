@@ -101,3 +101,36 @@ env ok
 The Vercel part (own account, `vercel link`, `vercel --prod`) waits for a
 `vercel login` in this environment. The Interactions Endpoint URL cannot be
 saved before #8 anyway.
+
+## Later the same day: the Vercel half
+
+```bash
+pnpm setup && pnpm add -g vercel && vercel login && vercel whoami
+vercel link --yes --project dv-bot-dev-reference
+vercel env add DISCORD_APPLICATION_ID production   # … and the other seven, value from .env.local
+vercel env ls production
+pnpm build && vercel --prod --yes
+```
+
+```text
+✓ Added  DISCORD_APPLICATION_ID DISCORD_PUBLIC_KEY DISCORD_BOT_TOKEN DISCORD_GUILD_ID CRON_SECRET REMINDER_WEBHOOK_URL REPORT_TEAM_USER_IDS DATABASE_URL
+● Ready  Production  https://dv-bot-dev-reference.vercel.app
+```
+
+```bash
+curl -s https://dv-bot-dev-reference.vercel.app/api/health
+curl -s -o /dev/null -w '%{http_code}' -X POST -d '{"type":1}' https://dv-bot-dev-reference.vercel.app/api/interactions
+```
+
+```text
+{"ok":true}
+401
+```
+
+Two things to know about `vercel link`: it writes `.vercel/` (git-ignored
+already) and it **appends `VERCEL_OIDC_TOKEN` to `.env.local`**. Harmless,
+but do not be surprised by the extra line.
+
+`DATABASE_URL` on this deployment is `file:/tmp/reports.db`: a scratch file
+with no tables, enough for PING, `/ping` and the health check. Anything that
+touches reports needs Turso (`docs/deploy.md`), which is the next step.
