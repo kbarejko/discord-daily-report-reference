@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Added
 
+- pnpm register-commands puts the bot's commands on your test server.
 - One tested rule for "today" in Europe/Warsaw.
 - Settings are checked at startup; a missing one is named in the error.
 - Requests that are not signed by Discord are recognised.
