@@ -1,4 +1,5 @@
 import { getEnv } from '@/env'
+import { routeCommand } from '@/discord/router'
 import { type Interaction, InteractionResponseType, InteractionType } from '@/discord/types'
 import { verifySignature } from '@/discord/verify'
 
@@ -23,6 +24,9 @@ export async function POST(request: Request): Promise<Response> {
 
   if (interaction.type === InteractionType.Ping) {
     return Response.json({ type: InteractionResponseType.Pong })
+  }
+  if (interaction.type === InteractionType.ApplicationCommand) {
+    return Response.json(await routeCommand(interaction))
   }
   return Response.json({ error: 'unsupported interaction type' }, { status: 400 })
 }
