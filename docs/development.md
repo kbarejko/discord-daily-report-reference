@@ -22,9 +22,24 @@ it in `.env.local` as `DISCORD_GUILD_ID`.
 3. _Bot_ → _Reset Token_, copy it once → `DISCORD_BOT_TOKEN`. It is a password:
    it goes only in `.env.local`, never in a commit, an issue or a Discord
    message.
-4. _OAuth2 → URL Generator_: scopes `bot` + `applications.commands`, bot
-   permission _Send Messages_. Open the generated URL and add the bot to your
-   test server.
+4. Add the bot to your test server. Either _OAuth2 → URL Generator_ (scopes
+   `bot` + `applications.commands`, bot permission _Send Messages_), or type
+   the same link yourself, with your Application ID:
+   `https://discord.com/oauth2/authorize?client_id=<APPLICATION_ID>&scope=bot%20applications.commands&permissions=2048`.
+   Open it, pick the server, _Authorize_. The bot appears on the member list
+   as offline; that is right, it never connects to the gateway (D1).
+
+Check the three values without deploying anything. With the token from
+`.env.local`, Discord answers who the bot is and whether it is on your server:
+
+```bash
+T=$(grep '^DISCORD_BOT_TOKEN=' .env.local | cut -d= -f2)
+curl -s -H "Authorization: Bot $T" https://discord.com/api/v10/users/@me          # {"username":"…","bot":true}
+curl -s -H "Authorization: Bot $T" https://discord.com/api/v10/guilds/$(grep '^DISCORD_GUILD_ID=' .env.local | cut -d= -f2)
+```
+
+The second call answers `{"message":"Unknown Guild","code":10004}` until the
+bot is on the server. Then it answers with the server's name.
 
 ## 3. A public URL for your bot: your own Vercel deployment
 
@@ -103,5 +118,6 @@ press `Ctrl+R` in Discord.
 | Discord still sees the old behaviour | Run `vercel --prod` again and wait for `Production:` before trying.                                         |
 | `vercel --prod` fails in the build   | Run `pnpm build` locally and read the first error. The deployed build has the same code.                    |
 | `401` on every request               | `DISCORD_PUBLIC_KEY` is from a different application.                                                       |
+| `Unknown Guild` from the API         | The bot is not on that server: open the authorise link from section 2 again. The id is probably right.      |
 | The command is not in the list       | Not registered on this server (`pnpm register-commands`), or Discord needs `Ctrl+R`.                        |
 | Changes in `.env.local` are ignored  | Restart `pnpm dev`.                                                                                         |

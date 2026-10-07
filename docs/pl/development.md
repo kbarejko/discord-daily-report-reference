@@ -23,9 +23,24 @@ _Kopiuj ID serwera_ i wpisz je w `.env.local` jako `DISCORD_GUILD_ID`.
 3. _Bot_ → _Reset Token_, skopiuj go raz → `DISCORD_BOT_TOKEN`. To hasło:
    trafia tylko do `.env.local`, nigdy do commita, issue ani wiadomości na
    Discordzie.
-4. _OAuth2 → URL Generator_: scopes `bot` + `applications.commands`,
-   uprawnienie bota _Send Messages_. Otwórz wygenerowany adres i dodaj bota
-   do swojego serwera testowego.
+4. Dodaj bota do swojego serwera testowego. Albo _OAuth2 → URL Generator_
+   (scopes `bot` + `applications.commands`, uprawnienie bota _Send Messages_),
+   albo wpisz ten sam adres sam, ze swoim Application ID:
+   `https://discord.com/oauth2/authorize?client_id=<APPLICATION_ID>&scope=bot%20applications.commands&permissions=2048`.
+   Otwórz go, wybierz serwer, _Autoryzuj_. Bot pojawi się na liście członków
+   jako offline; tak ma być, nigdy nie łączy się z gatewayem (D1).
+
+Sprawdź trzy wartości bez żadnego deployu. Z tokenem z `.env.local` Discord
+odpowiada, kim jest bot i czy jest na Twoim serwerze:
+
+```bash
+T=$(grep '^DISCORD_BOT_TOKEN=' .env.local | cut -d= -f2)
+curl -s -H "Authorization: Bot $T" https://discord.com/api/v10/users/@me          # {"username":"…","bot":true}
+curl -s -H "Authorization: Bot $T" https://discord.com/api/v10/guilds/$(grep '^DISCORD_GUILD_ID=' .env.local | cut -d= -f2)
+```
+
+Drugie polecenie odpowiada `{"message":"Unknown Guild","code":10004}`, dopóki
+bota nie ma na serwerze. Potem odpowiada nazwą serwera.
 
 ## 3. Publiczny adres Twojego bota: własny deploy na Vercelu
 
