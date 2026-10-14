@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Fixed
 
+- `GET /api/health` fails when the reports table is missing; it used to pass on an empty database.
 - `/eksport` answers with an error message when building the file fails, instead of thinking forever.
 - `/eksport` says "22 raporty", not "22 raportów": the Polish plural follows the last digit.
 - `/raport dzien:` and `/eksport od:`/`do:` reject a day that does not exist, such as 2026-09-31.
