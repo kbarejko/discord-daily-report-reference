@@ -51,7 +51,7 @@ export const messages = {
   export: {
     thinking: 'Przygotowuję plik…',
     ready: (from: string, to: string, count: number) =>
-      `Dziennik za ${from} – ${to}: ${count} ${count === 1 ? 'raport' : count >= 2 && count <= 4 ? 'raporty' : 'raportów'}.`,
+      `Dziennik za ${from} – ${to}: ${count} ${reportNoun(count)}.`,
     empty: (from: string, to: string) =>
       `Brak raportów za ${from} – ${to}. Plik zawiera same puste dni.`,
     badRange: 'Daty podaj jako RRRR-MM-DD, „od” nie później niż „do”.',
@@ -92,6 +92,14 @@ export const messages = {
     },
   },
 } as const
+
+/** 1 raport, 2–4 / 22–24 raporty, otherwise raportów (12–14 too). */
+function reportNoun(count: number): string {
+  if (count === 1) return 'raport'
+  const lastDigit = count % 10
+  const lastTwo = count % 100
+  return lastDigit >= 2 && lastDigit <= 4 && (lastTwo < 12 || lastTwo > 14) ? 'raporty' : 'raportów'
+}
 
 /** 7 → "7 h", 7.5 → "7,5 h": Polish decimal comma. */
 export function formatHours(hours: number): string {
