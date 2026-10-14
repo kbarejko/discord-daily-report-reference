@@ -10,18 +10,32 @@ Turso (D5). The mentor owns the production keys; an intern deploys by merging.
 
 1. **Vercel project.** [vercel.com/new](https://vercel.com/new) → import
    `DigitalVantage/discord-daily-report` (public repository; the Hobby plan is
-   enough). Framework: Next.js, no overrides.
+   enough). Framework: Next.js, no overrides. Import it from GitHub, do not
+   create it with `vercel` in a terminal: a project made that way has no Git
+   connection, so a merge deploys nothing and `vercel --prod` after a merge
+   made on GitHub is blocked ("the commit author doesn't have permission").
+   Already made one? Settings → Git → Connect Git Repository.
 2. **Turso database.**
+
    ```bash
-   turso db create dv-daily-report --location fra
+   turso group create default --location aws-us-east-1
+   turso db create dv-daily-report --group default
    turso db show dv-daily-report --url        # → DATABASE_URL (libsql://…)
    turso db tokens create dv-daily-report     # → DATABASE_AUTH_TOKEN
    ```
-   Apply the migrations from your laptop, once, with those two values in a
-   temporary `.env.production`:
+
+   Put the database next to the functions: Vercel runs them in `iad1`
+   (Washington, see Settings → Functions), so `aws-us-east-1`; Discord gives
+   the bot 3 seconds. `turso db locations` lists the regions.
+
+   Apply the migrations from your laptop, once. The script checks every
+   variable, so load `.env.local` and let a temporary `.env.production` with
+   those two values override it (the later file wins):
+
    ```bash
-   tsx --env-file=.env.production scripts/migrate.ts
+   tsx --env-file=.env.local --env-file=.env.production scripts/migrate.ts
    ```
+
 3. **Production Discord application**: a separate application in the
    Developer Portal, the bot added to the team server with `bot` +
    `applications.commands` and _Send Messages_.
@@ -37,6 +51,10 @@ Turso (D5). The mentor owns the production keys; an intern deploys by merging.
    | `REMINDER_WEBHOOK_URL`                                              | the reports channel → Integrations → Webhooks (D13)                                                   |
    | `REPORT_TEAM_USER_IDS`                                              | Discord ids of the interns, comma-separated                                                           |
    | `DASHBOARD_PASSWORD`                                                | `openssl rand -base64 18`; the password of `/raporty` (D14). Leave it out and the page does not exist |
+
+   `vercel env add` does not overwrite a variable that already exists. Check
+   `vercel env ls production` first, and `vercel env rm <NAME> production`
+   before adding a new value.
 
 5. **Deploy**: push to `main`, or Deployments → Redeploy. Wait for
    `Ready`.
