@@ -29,6 +29,11 @@ const schema = z.object({
         .map((id) => id.trim())
         .filter(Boolean),
     ),
+  /** The one password of the team page /raporty (D14). Empty: the page does not exist. */
+  DASHBOARD_PASSWORD: z
+    .string()
+    .optional()
+    .transform((value) => value || undefined),
 })
 
 export type Env = z.infer<typeof schema>

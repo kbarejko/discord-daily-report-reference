@@ -74,6 +74,11 @@ export const messages = {
     empty: 'Nie masz jeszcze żadnego raportu. Wpisz /raport, żeby dodać dzisiejszy.',
     line: (day: string, hours: number) => `${day} · ${formatHours(hours)}`,
   },
+
+  /** The read-only web page for the mentor (#38). */
+  teamPage: {
+    passwordNeeded: 'Ta strona wymaga hasła.',
+  },
 } as const
 
 /** 7 → "7 h", 7.5 → "7,5 h": Polish decimal comma. */
