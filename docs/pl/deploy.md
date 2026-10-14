@@ -11,18 +11,32 @@ merge.
 
 1. **Projekt Vercel.** [vercel.com/new](https://vercel.com/new) → import
    `DigitalVantage/discord-daily-report` (repozytorium publiczne; plan Hobby
-   wystarczy). Framework: Next.js, bez zmian.
+   wystarczy). Framework: Next.js, bez zmian. Importuj z GitHuba, nie twórz
+   projektu przez `vercel` w terminalu: taki projekt nie jest połączony z Gitem,
+   więc merge niczego nie wdraża, a `vercel --prod` po merge'u zrobionym na
+   GitHubie jest blokowane („the commit author doesn't have permission”).
+   Już tak powstał? Settings → Git → Connect Git Repository.
 2. **Baza Turso.**
+
    ```bash
-   turso db create dv-daily-report --location fra
+   turso group create default --location aws-us-east-1
+   turso db create dv-daily-report --group default
    turso db show dv-daily-report --url        # → DATABASE_URL (libsql://…)
    turso db tokens create dv-daily-report     # → DATABASE_AUTH_TOKEN
    ```
-   Migracje z laptopa, raz, z tymi dwiema wartościami w tymczasowym
-   `.env.production`:
+
+   Baza obok funkcji: Vercel uruchamia je w `iad1` (Waszyngton, patrz
+   Settings → Functions), więc `aws-us-east-1`; Discord daje botowi 3 sekundy.
+   `turso db locations` pokazuje regiony.
+
+   Migracje z laptopa, raz. Skrypt sprawdza wszystkie zmienne, więc wczytaj
+   `.env.local`, a tymczasowy `.env.production` z tymi dwiema wartościami
+   niech go nadpisze (późniejszy plik wygrywa):
+
    ```bash
-   tsx --env-file=.env.production scripts/migrate.ts
+   tsx --env-file=.env.local --env-file=.env.production scripts/migrate.ts
    ```
+
 3. **Produkcyjna aplikacja Discord**: osobna aplikacja w Developer Portal, bot
    dodany na serwer zespołu z `bot` + `applications.commands` i _Send
    Messages_.
@@ -38,6 +52,10 @@ merge.
    | `REMINDER_WEBHOOK_URL`                                              | kanał raportów → Integracje → Webhooki (D13)                                           |
    | `REPORT_TEAM_USER_IDS`                                              | id Discorda praktykantów, po przecinku                                                 |
    | `DASHBOARD_PASSWORD`                                                | `openssl rand -base64 18`; hasło do `/raporty` (D14). Bez niej strony nie ma           |
+
+   `vercel env add` nie nadpisuje istniejącej zmiennej. Najpierw
+   `vercel env ls production`, a przed nową wartością
+   `vercel env rm <NAZWA> production`.
 
 5. **Deploy**: push na `main` albo Deployments → Redeploy. Poczekaj na
    `Ready`.
