@@ -12,13 +12,12 @@ import {
   userOf,
 } from '@/discord/types'
 import { messages } from '@/messages'
-import { dayOf } from '@/reports/day'
+import { dayOf, isRealDay } from '@/reports/day'
 import { limits, validateReport } from '@/reports/validate'
 
 export const RAPORT_MODAL = 'raport'
 /** A report older than this many days is the mentor's to fix (decision #31). */
 export const MAX_DAYS_BACK = 7
-const DAY = /^\d{4}-\d{2}-\d{2}$/
 
 function daysBetween(from: string, to: string): number {
   return Math.round((Date.parse(`${to}T12:00:00Z`) - Date.parse(`${from}T12:00:00Z`)) / 86_400_000)
@@ -30,8 +29,7 @@ export function resolveDay(
   today: string,
 ): { ok: true; day: string } | { ok: false; error: string } {
   if (option === undefined) return { ok: true, day: today }
-  if (!DAY.test(option) || Number.isNaN(Date.parse(`${option}T12:00:00Z`)))
-    return { ok: false, error: messages.raportDay.badDate }
+  if (!isRealDay(option)) return { ok: false, error: messages.raportDay.badDate }
   if (option > today) return { ok: false, error: messages.raportDay.future(option) }
   if (daysBetween(option, today) > MAX_DAYS_BACK)
     return { ok: false, error: messages.raportDay.tooOld(option, MAX_DAYS_BACK) }

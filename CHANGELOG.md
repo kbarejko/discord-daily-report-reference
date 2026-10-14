@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Fixed
 
+- `/raport dzien:` and `/eksport od:`/`do:` reject a day that does not exist, such as 2026-09-31.
 - An empty `DATABASE_AUTH_TOKEN=` line in `.env.local` is accepted again (it was in #6, lost in #32).
 
 ### Added

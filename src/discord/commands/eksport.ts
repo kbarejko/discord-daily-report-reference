@@ -9,9 +9,8 @@ import {
 } from '@/discord/types'
 import { toMarkdown } from '@/export/markdown'
 import { messages } from '@/messages'
-import { dayOf } from '@/reports/day'
+import { dayOf, isRealDay } from '@/reports/day'
 
-const DAY = /^\d{4}-\d{2}-\d{2}$/
 /** The internship started on 5 October 2026 (README). */
 export const INTERNSHIP_START = '2026-10-05'
 
@@ -26,7 +25,7 @@ export async function eksport(
 ): Promise<InteractionResponse> {
   const from = optionOf(interaction, 'od') ?? INTERNSHIP_START
   const to = optionOf(interaction, 'do') ?? dayOf(ctx.now())
-  if (!DAY.test(from) || !DAY.test(to) || from > to) {
+  if (!isRealDay(from) || !isRealDay(to) || from > to) {
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: { content: messages.export.badRange, flags: MessageFlags.Ephemeral },

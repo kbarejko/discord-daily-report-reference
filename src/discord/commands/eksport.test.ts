@@ -59,4 +59,10 @@ describe('/eksport', () => {
     expect(response.data?.content).toContain('RRRR-MM-DD')
     expect(ctx.sent).toHaveLength(0)
   })
+
+  it('rejects a day that does not exist', async () => {
+    const ctx = testContext()
+    const response = (await eksport(withOptions({ od: '2026-09-31' }), ctx)) as MessageResponse
+    expect(response.data?.content).toContain('RRRR-MM-DD')
+  })
 })
