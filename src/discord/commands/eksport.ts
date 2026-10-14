@@ -9,9 +9,8 @@ import {
 } from '@/discord/types'
 import { toMarkdown } from '@/export/markdown'
 import { messages } from '@/messages'
-import { dayOf } from '@/reports/day'
+import { dayOf, isRealDay } from '@/reports/day'
 
-const DAY = /^\d{4}-\d{2}-\d{2}$/
 /** The internship started on 5 October 2026 (README). */
 export const INTERNSHIP_START = '2026-10-05'
 
@@ -26,7 +25,7 @@ export async function eksport(
 ): Promise<InteractionResponse> {
   const from = optionOf(interaction, 'od') ?? INTERNSHIP_START
   const to = optionOf(interaction, 'do') ?? dayOf(ctx.now())
-  if (!DAY.test(from) || !DAY.test(to) || from > to) {
+  if (!isRealDay(from) || !isRealDay(to) || from > to) {
     return {
       type: InteractionResponseType.ChannelMessageWithSource,
       data: { content: messages.export.badRange, flags: MessageFlags.Ephemeral },
@@ -34,13 +33,22 @@ export async function eksport(
   }
   const user = userOf(interaction)
   ctx.defer(async () => {
-    const reports = await ctx.reports.listByUser(user.id, { from, to })
-    const file = toMarkdown(reports, { from, to }, user.username)
-    const content =
-      reports.length === 0
-        ? messages.export.empty(from, to)
-        : messages.export.ready(from, to, reports.length)
-    await ctx.discord.followUp(ctx.applicationId, interaction.token, { content, file })
+    try {
+      const reports = await ctx.reports.listByUser(user.id, { from, to })
+      const file = toMarkdown(reports, { from, to }, user.username)
+      const content =
+        reports.length === 0
+          ? messages.export.empty(from, to)
+          : messages.export.ready(from, to, reports.length)
+      await ctx.discord.followUp(ctx.applicationId, interaction.token, { content, file })
+    } catch (error) {
+      // The response is already sent, so handleInteraction (#22) cannot catch this:
+      // without a follow-up the caller would stare at "thinking…" forever.
+      console.error(`[interaction ${interaction.id}]`, error)
+      await ctx.discord
+        .followUp(ctx.applicationId, interaction.token, { content: messages.somethingWentWrong })
+        .catch((followUpError) => console.error(`[interaction ${interaction.id}]`, followUpError))
+    }
   })
   return {
     type: InteractionResponseType.DeferredChannelMessageWithSource,

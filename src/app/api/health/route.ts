@@ -1,11 +1,10 @@
-import { sql } from 'drizzle-orm'
-
 import { getDb } from '@/db/client'
+import { checkDatabase } from '@/db/health'
 
-/** For the hosting platform and a human in a browser: is the app up and can it reach the database? */
+/** For the hosting platform and a human in a browser: is the app up and can it read the reports table? */
 export async function GET(): Promise<Response> {
   try {
-    await getDb().run(sql`select 1`)
+    await checkDatabase(getDb())
     return Response.json({ ok: true })
   } catch (error) {
     console.error('[health]', error)

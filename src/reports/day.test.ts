@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { dayOf, isWorkingDay } from './day'
+import { dayOf, isRealDay, isWorkingDay } from './day'
 
 describe('dayOf', () => {
   it('is already the next day in Warsaw at 23:30 UTC', () => {
@@ -16,6 +16,17 @@ describe('dayOf', () => {
     expect(dayOf(new Date('2026-10-24T22:30:00Z'))).toBe('2026-10-25')
     expect(dayOf(new Date('2026-10-25T22:30:00Z'))).toBe('2026-10-25')
     expect(dayOf(new Date('2026-10-25T23:00:00Z'))).toBe('2026-10-26')
+  })
+})
+
+describe('isRealDay', () => {
+  it('accepts real days and rejects the rest', () => {
+    expect(isRealDay('2026-10-07')).toBe(true)
+    expect(isRealDay('2028-02-29')).toBe(true) // leap year
+    expect(isRealDay('2026-09-31')).toBe(false) // Date would roll it to 1 October
+    expect(isRealDay('2026-02-29')).toBe(false)
+    expect(isRealDay('2026-13-01')).toBe(false)
+    expect(isRealDay('7.10.2026')).toBe(false)
   })
 })
 

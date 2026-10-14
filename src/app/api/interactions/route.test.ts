@@ -14,7 +14,9 @@ beforeAll(async () => {
   ])) as CryptoKeyPair
   privateKey = pair.privateKey
   publicKey = bytesToHex(await crypto.subtle.exportKey('raw', pair.publicKey))
-  // The route reads env at import time, so set the key before importing it.
+  // getEnv() reads process.env once, on the first request, so every key is set before that.
+  // ':memory:' keeps the test away from ./data/reports.db, which a fresh clone does not have.
+  vi.stubEnv('DATABASE_URL', ':memory:')
   vi.stubEnv('DISCORD_APPLICATION_ID', '1')
   vi.stubEnv('DISCORD_PUBLIC_KEY', publicKey)
   vi.stubEnv('DISCORD_BOT_TOKEN', 't')

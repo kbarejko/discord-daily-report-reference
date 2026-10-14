@@ -33,7 +33,7 @@ Turso (D5). The mentor owns the production keys; an intern deploys by merging.
    those two values override it (the later file wins):
 
    ```bash
-   tsx --env-file=.env.local --env-file=.env.production scripts/migrate.ts
+   pnpm tsx --env-file=.env.local --env-file=.env.production scripts/migrate.ts
    ```
 
 3. **Production Discord application**: a separate application in the
@@ -62,10 +62,11 @@ Turso (D5). The mentor owns the production keys; an intern deploys by merging.
    Information → Interactions Endpoint URL =
    `https://<project>.vercel.app/api/interactions`. It saves only when the
    deployment answers PING and rejects bad signatures (#8).
-7. **Commands** on the team server, from your laptop with the production
-   values in `.env.production`:
+7. **Commands** on the team server, from your laptop: `.env.production` now
+   holds the production Discord values (application id, public key, bot token,
+   guild id) and overrides `.env.local`:
    ```bash
-   tsx --env-file=.env.production scripts/register-commands.ts
+   pnpm tsx --env-file=.env.local --env-file=.env.production scripts/register-commands.ts
    ```
 8. **Health**: open `https://<project>.vercel.app/api/health` → `{"ok":true}`.
 

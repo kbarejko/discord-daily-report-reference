@@ -34,7 +34,7 @@ merge.
    niech go nadpisze (późniejszy plik wygrywa):
 
    ```bash
-   tsx --env-file=.env.local --env-file=.env.production scripts/migrate.ts
+   pnpm tsx --env-file=.env.local --env-file=.env.production scripts/migrate.ts
    ```
 
 3. **Produkcyjna aplikacja Discord**: osobna aplikacja w Developer Portal, bot
@@ -63,10 +63,11 @@ merge.
    Information → Interactions Endpoint URL =
    `https://<projekt>.vercel.app/api/interactions`. Zapisze się tylko, gdy
    deploy odpowiada na PING i odrzuca złe podpisy (#8).
-7. **Komendy** na serwerze zespołu, z laptopa z wartościami produkcyjnymi w
-   `.env.production`:
+7. **Komendy** na serwerze zespołu, z laptopa: `.env.production` ma teraz
+   produkcyjne wartości Discorda (id aplikacji, klucz publiczny, token bota,
+   id serwera) i nadpisuje `.env.local`:
    ```bash
-   tsx --env-file=.env.production scripts/register-commands.ts
+   pnpm tsx --env-file=.env.local --env-file=.env.production scripts/register-commands.ts
    ```
 8. **Health**: otwórz `https://<projekt>.vercel.app/api/health` →
    `{"ok":true}`.

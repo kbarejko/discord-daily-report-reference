@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { command, testContext } from '@/discord/test-helpers'
 import type { ApplicationCommandInteraction, MessageResponse } from '@/discord/types'
+
+import { messages } from '@/messages'
 
 import { eksport } from './eksport'
 
@@ -41,6 +43,19 @@ describe('/eksport', () => {
     expect(sent.message.file?.content).toContain('## 2026-10-05 (poniedziałek)\n\n_brak raportu_')
   })
 
+  it('tells the caller when building the file fails, instead of leaving "thinking…"', async () => {
+    const ctx = testContext()
+    ctx.reports.listByUser = async () => {
+      throw new Error('database down')
+    }
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    await eksport(withOptions({}), ctx)
+    await ctx.flushDeferred()
+    expect(ctx.sent.map((s) => s.message.content)).toEqual([messages.somethingWentWrong])
+    expect(errors).toHaveBeenCalled()
+    errors.mockRestore()
+  })
+
   it('defaults to the whole internship up to today', async () => {
     const ctx = testContext()
     await eksport(command('eksport'), ctx)
@@ -58,5 +73,11 @@ describe('/eksport', () => {
     expect(response.type).toBe(4)
     expect(response.data?.content).toContain('RRRR-MM-DD')
     expect(ctx.sent).toHaveLength(0)
+  })
+
+  it('rejects a day that does not exist', async () => {
+    const ctx = testContext()
+    const response = (await eksport(withOptions({ od: '2026-09-31' }), ctx)) as MessageResponse
+    expect(response.data?.content).toContain('RRRR-MM-DD')
   })
 })

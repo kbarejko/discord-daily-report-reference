@@ -42,10 +42,6 @@ pnpm dev
 | `pnpm db:backup`         | zapisuje każdy raport do `backups/reports-<znacznik>.json`                   |
 | `pnpm db:restore <plik>` | wczytuje kopię z powrotem, zastępując raporty tej samej osoby i dnia         |
 
-Kolejne polecenia pojawią się razem z zadaniami, które je dodają
-(`register-commands`, `db:migrate`, …). Każde z tych zadań dopisuje swoją
-linię do tej tabeli.
-
 ## Komendy na Discordzie
 
 | Komenda                    | Co robi                                                                                                            |
@@ -70,7 +66,8 @@ Odpowiedzi widzisz tylko Ty. Jedyna publiczna wiadomość to przypomnienie o
   poprawionej kopii albo bezpośrednio w Turso).
 - Eksport to Markdown; wzór ze szkoły, jeśli przyjdzie, wymaga nowego
   eksportera obok `src/export/markdown.ts`.
-- Bez strony WWW: dziennik czyta się przez `/eksport` (decyzja w #38).
+- Strona `/raporty` jest tylko do odczytu i ma jedno wspólne hasło (D14, #38):
+  bez kont, bez edycji z przeglądarki.
 
 ## Praca we dwóch
 

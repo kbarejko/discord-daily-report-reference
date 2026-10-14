@@ -32,6 +32,14 @@ describe('resolveDay (#31)', () => {
     })
     expect(resolveDay('2026-02-30', today)).toMatchObject({ ok: false })
   })
+
+  it('rejects a day that does not exist, even within the 7 days', () => {
+    // Date.parse rolls 31 September over to 1 October instead of failing.
+    expect(resolveDay('2026-09-31', '2026-10-07')).toMatchObject({
+      ok: false,
+      error: expect.stringContaining('RRRR-MM-DD'),
+    })
+  })
 })
 
 describe('/raport dzien', () => {
