@@ -41,9 +41,6 @@ pnpm dev
 | `pnpm db:backup`         | writes every report to `backups/reports-<timestamp>.json`                            |
 | `pnpm db:restore <file>` | loads a backup back, replacing reports with the same person and day                  |
 
-More commands come with the issues that add them (`register-commands`,
-`db:migrate`, …). Each of those issues adds its line to this table.
-
 ## Commands in Discord
 
 | Command                    | Does                                                                                                             |
@@ -68,7 +65,8 @@ Replies are visible only to you. The one public message is the reminder at
   (`pnpm db:restore` of an edited backup, or directly in Turso).
 - The export is Markdown; the school's own template, if one arrives, needs a
   new exporter next to `src/export/markdown.ts`.
-- No web page: the diary is read through `/eksport` (decision in #38).
+- The web page `/raporty` is read-only and has one shared password (D14, #38): no
+  accounts, no editing from the browser.
 
 ## Working as a team of two
 
