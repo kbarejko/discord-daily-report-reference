@@ -25,8 +25,10 @@ ones left open (§6) are yours: make them in a pull request and write down why.
   reported yet.
 - Deployed on Vercel from `main`, with the database in Turso.
 
-**Out:** a web dashboard (a stretch issue), multiple teams or servers, editing
-reports from the web, attachments, AI summaries.
+**Out:** multiple teams or servers, editing reports from the web, attachments, AI summaries.
+
+**Added after the MVP:** a read-only page with everybody's reports for the
+mentor, `/raporty`, behind one password (D14, #38).
 
 ## 2. How a command travels
 
@@ -136,6 +138,7 @@ interface ReportRepository {
 | D11 | **Every developer has their own Discord application and test server.**                                                                                                                                    | Discord sends every interaction to one URL. Two people sharing an app would steal each other's requests.                                                                                                                                                               |
 | D12 | **Hosted on Vercel.** Production deploys from `main`; every pull request gets a preview URL. For Discord testing each developer deploys their own copy with the `vercel` command (`docs/development.md`). | No server to maintain, and a pull request can be tried live before merge. A stable URL per developer replaces a tunnel to the laptop.                                                                                                                                  |
 | D13 | **The reminder is posted through the channel's webhook** (`REMINDER_WEBHOOK_URL`), not with the bot token.                                                                                                | One URL to configure, and a webhook can write to exactly one channel. The bot token keeps one job: registering commands.                                                                                                                                               |
+| D14 | **The team page `/raporty` is behind HTTP Basic Auth with one password** (`DASHBOARD_PASSWORD`), checked in `src/proxy.ts`. No password set: the page answers 404.                                        | One reader, the mentor. A browser prompt is real protection for personal data and needs no login library, user table or sessions.                                                                                                                                      |
 
 ## 5. Discord reference
 
@@ -164,7 +167,8 @@ Decide each in its issue, and explain the choice in the pull request:
 3. **The export format.** Markdown, CSV, PDF? It depends on the school's
    diary template; ask your mentor for it.
 4. **The command names and texts.** Polish, short, consistent.
-5. **Whether a web page is worth building at all** (stretch milestone).
+5. **Whether a web page is worth building at all** (stretch milestone): yes,
+   since 14.10, see D14.
 
 ## 7. Risks
 
@@ -178,14 +182,15 @@ Decide each in its issue, and explain the choice in the pull request:
 
 ## 8. What changed on the way, and why
 
-| Where     | Was                                              | Is                                                                          | Why                                                                                                    |
-| --------- | ------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| D5        | SQLite file with `better-sqlite3`, Docker volume | Turso through `@libsql/client`, a local file in development                 | Vercel's file system does not survive a deploy; one client covers file, Turso and `:memory:` (#1, #14) |
-| D9        | external scheduler, `POST` with `CRON_SECRET`    | Vercel Cron, `GET`, `Authorization: Bearer` added by Vercel                 | no server to run cron on; the Hobby plan's daily run is enough for 15:00 (#1, #32)                     |
-| D12 (new) | own server, Docker                               | Vercel from `main`, previews per pull request, own deployment per developer | nothing to maintain; a stable URL per developer replaces a tunnel (#1, #4)                             |
-| D13 (new) | bot token + `DISCORD_REPORT_CHANNEL_ID`          | the channel's webhook                                                       | one setting, one channel, no token permissions (#32)                                                   |
-| §6.2      | open                                             | hours as `7`, `7.5`, `7,5`, `7 h`; 0,25–16; texts up to 1000                | decided in #17                                                                                         |
-| §6.3      | open                                             | Markdown, every working day visible                                         | decided in #27 without the school's template; reversible                                               |
-| #24       | after the handlers                               | before them                                                                 | the texts in one file first means no refactor later                                                    |
-| #31       | open                                             | 7 days back, older ones by the mentor                                       | a diary rewritten weeks later is not a daily log                                                       |
-| #34       | Dockerfile                                       | closed                                                                      | no Docker on Vercel                                                                                    |
+| Where          | Was                                              | Is                                                                          | Why                                                                                                    |
+| -------------- | ------------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| D5             | SQLite file with `better-sqlite3`, Docker volume | Turso through `@libsql/client`, a local file in development                 | Vercel's file system does not survive a deploy; one client covers file, Turso and `:memory:` (#1, #14) |
+| D9             | external scheduler, `POST` with `CRON_SECRET`    | Vercel Cron, `GET`, `Authorization: Bearer` added by Vercel                 | no server to run cron on; the Hobby plan's daily run is enough for 15:00 (#1, #32)                     |
+| D12 (new)      | own server, Docker                               | Vercel from `main`, previews per pull request, own deployment per developer | nothing to maintain; a stable URL per developer replaces a tunnel (#1, #4)                             |
+| D13 (new)      | bot token + `DISCORD_REPORT_CHANNEL_ID`          | the channel's webhook                                                       | one setting, one channel, no token permissions (#32)                                                   |
+| §6.2           | open                                             | hours as `7`, `7.5`, `7,5`, `7 h`; 0,25–16; texts up to 1000                | decided in #17                                                                                         |
+| §6.3           | open                                             | Markdown, every working day visible                                         | decided in #27 without the school's template; reversible                                               |
+| #24            | after the handlers                               | before them                                                                 | the texts in one file first means no refactor later                                                    |
+| #31            | open                                             | 7 days back, older ones by the mentor                                       | a diary rewritten weeks later is not a daily log                                                       |
+| #34            | Dockerfile                                       | closed                                                                      | no Docker on Vercel                                                                                    |
+| #38, D14 (new) | not built: no reader outside Discord             | `/raporty` behind one password                                              | the mentor asked for it on 14.10 (#38)                                                                 |

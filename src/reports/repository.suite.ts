@@ -49,5 +49,14 @@ export function describeReportRepository(name: string, make: () => Promise<Repor
       expect((await repo.listUserIdsWithReport('2026-10-07')).sort()).toEqual(['u1', 'u2'])
       expect(await repo.listUserIdsWithReport('2026-10-08')).toEqual([])
     })
+
+    it('lists every report, newest day first, then by user', async () => {
+      const repo = await make()
+      await repo.upsert({ ...base, discordUserId: 'u2', day: '2026-10-08' })
+      await repo.upsert({ ...base, day: '2026-10-07' })
+      await repo.upsert({ ...base, day: '2026-10-08' })
+      const all = (await repo.listAll()).map((r) => `${r.day} ${r.discordUserId}`)
+      expect(all).toEqual(['2026-10-08 u1', '2026-10-08 u2', '2026-10-07 u1'])
+    })
   })
 }

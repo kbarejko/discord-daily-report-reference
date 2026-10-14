@@ -74,6 +74,23 @@ export const messages = {
     empty: 'Nie masz jeszcze żadnego raportu. Wpisz /raport, żeby dodać dzisiejszy.',
     line: (day: string, hours: number) => `${day} · ${formatHours(hours)}`,
   },
+
+  /** The read-only web page for the mentor (#38). */
+  teamPage: {
+    passwordNeeded: 'Ta strona wymaga hasła.',
+    title: 'Raporty zespołu',
+    empty: 'Nie ma jeszcze żadnego raportu.',
+    summary: (p: { totalHours: number; targetHours: number; reportedDays: number }) =>
+      `${formatHours(p.totalHours)} z ${p.targetHours} h · raportów: ${p.reportedDays}`,
+    perDayNeeded: (hours: number) => `Do celu potrzeba ${formatHours(hours)} dziennie.`,
+    columns: {
+      day: 'Dzień',
+      hours: 'Godziny',
+      done: 'Co zrobione',
+      problems: 'Trudności',
+      plan: 'Plan',
+    },
+  },
 } as const
 
 /** 7 → "7 h", 7.5 → "7,5 h": Polish decimal comma. */

@@ -34,6 +34,7 @@ describe('parseEnv', () => {
 
   it('accepts an empty optional variable, as .env.example ships it', () => {
     expect(parseEnv({ ...valid, DATABASE_AUTH_TOKEN: '' }).DATABASE_AUTH_TOKEN).toBeUndefined()
+    expect(parseEnv({ ...valid, DASHBOARD_PASSWORD: '' }).DASHBOARD_PASSWORD).toBeUndefined()
   })
 
   it('treats an empty string as missing', () => {
