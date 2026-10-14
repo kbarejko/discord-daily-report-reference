@@ -25,12 +25,19 @@ journal before anyone read it. Fixed by wrapping the script in `main()`.
 sees it" (D8). The number of milliseconds is the time between receiving the
 request and answering.
 
-## Still open: both test servers
+## Live on Discord 🇵🇱 Na żywo w Discordzie
 
-The issue says "works on both test servers". That needs the app on a public
-address and the Endpoint URL saved (#8); this run waits for `vercel login`.
-Until then Discord still answers "The application did not respond" to
-`/ping`, which is correct: nothing is deployed.
+On 2026-10-14 the mentor typed `/ping` in `#raporty` on **DV Interns' server**.
+The deployed bot (`https://dv-bot-dev-reference.vercel.app`, #8) answered
+`pong (0 ms)`, marked "Only you can see this" (D8). The 0 ms is expected: the
+handler measures only its own work, not the trip from Discord.
+🇵🇱 _14.10.2026 opiekun wpisał `/ping` na kanale `#raporty` na **DV Interns' server**. Bot z deployu (#8) odpowiedział `pong (0 ms)` z dopiskiem „Only you can see this” (D8). 0 ms jest w porządku: obsługa mierzy tylko własną pracę, nie drogę z Discorda._
+
+![/ping answered with pong (0 ms) on DV Interns' server](img/11-ping-discord.png)
+
+This reference has one test server, so "both test servers" is checked on that
+one. The interns check it on each other's servers.
+🇵🇱 _Ten projekt ma jeden serwer testowy, więc punkt „oba serwery testowe” sprawdzony na nim. Praktykanci sprawdzają go na serwerach kolegi._
 
 ## What I learned 🇵🇱 Czego się nauczyłem
 
