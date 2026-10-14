@@ -31,4 +31,10 @@ export class MemoryReportRepository implements ReportRepository {
   async listUserIdsWithReport(day: string): Promise<string[]> {
     return this.reports.filter((r) => r.day === day).map((r) => r.discordUserId)
   }
+
+  async listAll(): Promise<Report[]> {
+    return [...this.reports].sort(
+      (a, b) => b.day.localeCompare(a.day) || a.discordUserId.localeCompare(b.discordUserId),
+    )
+  }
 }

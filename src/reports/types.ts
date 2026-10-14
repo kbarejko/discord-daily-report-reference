@@ -20,4 +20,6 @@ export interface ReportRepository {
   listByUser(discordUserId: string, range: { from: string; to: string }): Promise<Report[]>
   /** Who reported on a given day, for the reminder. */
   listUserIdsWithReport(day: string): Promise<string[]>
+  /** Every report of every person, newest day first, for the team page (#38). */
+  listAll(): Promise<Report[]>
 }

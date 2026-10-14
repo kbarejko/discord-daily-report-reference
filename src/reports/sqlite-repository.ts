@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, lte } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, lte } from 'drizzle-orm'
 
 import type { Db } from '@/db/client'
 import { reports } from '@/db/schema'
@@ -54,5 +54,11 @@ export class SqliteReportRepository implements ReportRepository {
       .from(reports)
       .where(eq(reports.day, day))
     return rows.map((r) => r.discordUserId)
+  }
+
+  async listAll(): Promise<Report[]> {
+    return this.db.query.reports.findMany({
+      orderBy: [desc(reports.day), asc(reports.discordUserId)],
+    })
   }
 }
