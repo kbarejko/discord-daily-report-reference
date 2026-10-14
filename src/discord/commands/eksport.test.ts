@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { command, testContext } from '@/discord/test-helpers'
 import type { ApplicationCommandInteraction, MessageResponse } from '@/discord/types'
+
+import { messages } from '@/messages'
 
 import { eksport } from './eksport'
 
@@ -39,6 +41,19 @@ describe('/eksport', () => {
     expect(sent.message.file?.filename).toBe('dziennik-anna-2026-10-05-2026-10-07.md')
     expect(sent.message.file?.content).toContain('## 2026-10-06 (wtorek)')
     expect(sent.message.file?.content).toContain('## 2026-10-05 (poniedziałek)\n\n_brak raportu_')
+  })
+
+  it('tells the caller when building the file fails, instead of leaving "thinking…"', async () => {
+    const ctx = testContext()
+    ctx.reports.listByUser = async () => {
+      throw new Error('database down')
+    }
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+    await eksport(withOptions({}), ctx)
+    await ctx.flushDeferred()
+    expect(ctx.sent.map((s) => s.message.content)).toEqual([messages.somethingWentWrong])
+    expect(errors).toHaveBeenCalled()
+    errors.mockRestore()
   })
 
   it('defaults to the whole internship up to today', async () => {

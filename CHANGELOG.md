@@ -7,6 +7,7 @@ same pull request as the code.
 
 ### Fixed
 
+- `/eksport` answers with an error message when building the file fails, instead of thinking forever.
 - `/eksport` says "22 raporty", not "22 raportów": the Polish plural follows the last digit.
 - `/raport dzien:` and `/eksport od:`/`do:` reject a day that does not exist, such as 2026-09-31.
 - An empty `DATABASE_AUTH_TOKEN=` line in `.env.local` is accepted again (it was in #6, lost in #32).

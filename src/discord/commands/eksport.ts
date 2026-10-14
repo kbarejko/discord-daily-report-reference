@@ -33,13 +33,22 @@ export async function eksport(
   }
   const user = userOf(interaction)
   ctx.defer(async () => {
-    const reports = await ctx.reports.listByUser(user.id, { from, to })
-    const file = toMarkdown(reports, { from, to }, user.username)
-    const content =
-      reports.length === 0
-        ? messages.export.empty(from, to)
-        : messages.export.ready(from, to, reports.length)
-    await ctx.discord.followUp(ctx.applicationId, interaction.token, { content, file })
+    try {
+      const reports = await ctx.reports.listByUser(user.id, { from, to })
+      const file = toMarkdown(reports, { from, to }, user.username)
+      const content =
+        reports.length === 0
+          ? messages.export.empty(from, to)
+          : messages.export.ready(from, to, reports.length)
+      await ctx.discord.followUp(ctx.applicationId, interaction.token, { content, file })
+    } catch (error) {
+      // The response is already sent, so handleInteraction (#22) cannot catch this:
+      // without a follow-up the caller would stare at "thinking…" forever.
+      console.error(`[interaction ${interaction.id}]`, error)
+      await ctx.discord
+        .followUp(ctx.applicationId, interaction.token, { content: messages.somethingWentWrong })
+        .catch((followUpError) => console.error(`[interaction ${interaction.id}]`, followUpError))
+    }
   })
   return {
     type: InteractionResponseType.DeferredChannelMessageWithSource,
