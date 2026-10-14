@@ -52,6 +52,7 @@ export function testContext(): TestContext {
     discord: {
       followUp: async (applicationId, token, message) =>
         void sent.push({ applicationId, token, message }),
+      displayName: async () => null,
     },
     defer: (work) => void deferred.push(work),
     sent,

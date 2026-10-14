@@ -78,6 +78,18 @@ export const messages = {
   /** The read-only web page for the mentor (#38). */
   teamPage: {
     passwordNeeded: 'Ta strona wymaga hasła.',
+    title: 'Raporty zespołu',
+    empty: 'Nie ma jeszcze żadnego raportu.',
+    summary: (p: { totalHours: number; targetHours: number; reportedDays: number }) =>
+      `${formatHours(p.totalHours)} z ${p.targetHours} h · raportów: ${p.reportedDays}`,
+    perDayNeeded: (hours: number) => `Do celu potrzeba ${formatHours(hours)} dziennie.`,
+    columns: {
+      day: 'Dzień',
+      hours: 'Godziny',
+      done: 'Co zrobione',
+      problems: 'Trudności',
+      plan: 'Plan',
+    },
   },
 } as const
 

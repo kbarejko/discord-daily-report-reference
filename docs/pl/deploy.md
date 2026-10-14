@@ -37,6 +37,7 @@ merge.
    | `CRON_SECRET`                                                       | `openssl rand -hex 24`; Vercel wysyła go jako `Authorization: Bearer` do route'a crona |
    | `REMINDER_WEBHOOK_URL`                                              | kanał raportów → Integracje → Webhooki (D13)                                           |
    | `REPORT_TEAM_USER_IDS`                                              | id Discorda praktykantów, po przecinku                                                 |
+   | `DASHBOARD_PASSWORD`                                                | `openssl rand -base64 18`; hasło do `/raporty` (D14). Bez niej strony nie ma           |
 
 5. **Deploy**: push na `main` albo Deployments → Redeploy. Poczekaj na
    `Ready`.

@@ -9,6 +9,8 @@ export type FollowUp = {
 export type DiscordClient = {
   /** Edits the deferred reply of an interaction, optionally with a file attached. */
   followUp(applicationId: string, token: string, message: FollowUp): Promise<void>
+  /** The name Discord shows for a user (global name, else user name); null when Discord does not answer. */
+  displayName(userId: string, botToken: string): Promise<string | null>
 }
 
 const API = 'https://discord.com/api/v10'
@@ -34,6 +36,17 @@ export function createDiscordClient(fetchFn: typeof fetch = fetch): DiscordClien
       )
       if (!response.ok)
         throw new Error(`Discord follow-up failed: ${response.status} ${await response.text()}`)
+    },
+
+    async displayName(userId, botToken) {
+      // Names change rarely: Next keeps the answer for a day instead of asking on every page view.
+      const response = await fetchFn(`${API}/users/${userId}`, {
+        headers: { Authorization: `Bot ${botToken}` },
+        next: { revalidate: 86_400 },
+      })
+      if (!response.ok) return null
+      const user = (await response.json()) as { username: string; global_name: string | null }
+      return user.global_name ?? user.username
     },
   }
 }

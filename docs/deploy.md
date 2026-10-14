@@ -28,14 +28,15 @@ Turso (D5). The mentor owns the production keys; an intern deploys by merging.
 4. **Environment variables** in Vercel → Settings → Environment Variables,
    scope Production:
 
-   | Variable                                                            | From                                                                                 |
-   | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-   | `DISCORD_APPLICATION_ID`, `DISCORD_PUBLIC_KEY`, `DISCORD_BOT_TOKEN` | the production application                                                           |
-   | `DISCORD_GUILD_ID`                                                  | the team server                                                                      |
-   | `DATABASE_URL`, `DATABASE_AUTH_TOKEN`                               | Turso, step 2                                                                        |
-   | `CRON_SECRET`                                                       | `openssl rand -hex 24`; Vercel sends it as `Authorization: Bearer` to the cron route |
-   | `REMINDER_WEBHOOK_URL`                                              | the reports channel → Integrations → Webhooks (D13)                                  |
-   | `REPORT_TEAM_USER_IDS`                                              | Discord ids of the interns, comma-separated                                          |
+   | Variable                                                            | From                                                                                                  |
+   | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+   | `DISCORD_APPLICATION_ID`, `DISCORD_PUBLIC_KEY`, `DISCORD_BOT_TOKEN` | the production application                                                                            |
+   | `DISCORD_GUILD_ID`                                                  | the team server                                                                                       |
+   | `DATABASE_URL`, `DATABASE_AUTH_TOKEN`                               | Turso, step 2                                                                                         |
+   | `CRON_SECRET`                                                       | `openssl rand -hex 24`; Vercel sends it as `Authorization: Bearer` to the cron route                  |
+   | `REMINDER_WEBHOOK_URL`                                              | the reports channel → Integrations → Webhooks (D13)                                                   |
+   | `REPORT_TEAM_USER_IDS`                                              | Discord ids of the interns, comma-separated                                                           |
+   | `DASHBOARD_PASSWORD`                                                | `openssl rand -base64 18`; the password of `/raporty` (D14). Leave it out and the page does not exist |
 
 5. **Deploy**: push to `main`, or Deployments → Redeploy. Wait for
    `Ready`.

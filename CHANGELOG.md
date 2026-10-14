@@ -11,6 +11,7 @@ same pull request as the code.
 
 ### Added
 
+- `/raporty`: a read-only page with everybody's reports and hours, behind one password.
 - `pnpm db:backup` and `pnpm db:restore` copy every report out of the database and back.
 - `GET /api/health` answers `{ ok: true }` when the app can reach its database.
 - A reminder at 15:00 on working days names who has not reported yet; silent when everyone has.

@@ -37,8 +37,10 @@ zapiszcie dlaczego.
   wysłali raportu.
 - Wdrożone na Vercelu z gałęzi `main`, z bazą w Turso.
 
-**Poza zakresem:** panel WWW (zadanie dodatkowe), wiele zespołów lub serwerów,
-edycja raportów z przeglądarki, załączniki, podsumowania przez AI.
+**Poza zakresem:** wiele zespołów lub serwerów, edycja raportów z przeglądarki, załączniki, podsumowania przez AI.
+
+**Dodane po MVP:** strona tylko do odczytu z raportami wszystkich dla
+opiekuna, `/raporty`, za jednym hasłem (D14, #38).
 
 ## 2. Jak wędruje komenda
 
@@ -149,6 +151,7 @@ interface ReportRepository {
 | D11 | **Każdy deweloper ma własną aplikację Discord i własny serwer testowy.**                                                                                                                                      | Discord wysyła każdą interakcję na jeden adres. Dwie osoby na jednej aplikacji zabierałyby sobie żądania.                                                                                                                                                        |
 | D12 | **Hosting na Vercelu.** Produkcja wdraża się z `main`; każdy pull request dostaje adres podglądowy. Do testów z Discordem każdy deweloper wdraża własną kopię poleceniem `vercel` (`docs/pl/development.md`). | Nie ma serwera do utrzymania, a pull request da się wypróbować na żywo przed merge'em. Stały adres na dewelopera zastępuje tunel do laptopa.                                                                                                                     |
 | D13 | **Przypomnienie idzie przez webhook kanału** (`REMINDER_WEBHOOK_URL`), nie przez token bota.                                                                                                                  | Jeden adres do skonfigurowania, a webhook pisze dokładnie na jeden kanał. Token bota ma jedno zadanie: rejestrację komend.                                                                                                                                       |
+| D14 | **Strona zespołu `/raporty` jest za HTTP Basic Auth z jednym hasłem** (`DASHBOARD_PASSWORD`), sprawdzanym w `src/proxy.ts`. Bez hasła strona odpowiada 404.                                                   | Jeden czytelnik, opiekun. Okienko przeglądarki to prawdziwa ochrona danych osobowych i nie wymaga biblioteki logowania, tabeli użytkowników ani sesji.                                                                                                           |
 
 ## 5. Ściąga z Discorda
 
@@ -177,7 +180,8 @@ Każdą podejmijcie w jej zadaniu i wyjaśnijcie wybór w pull requeście:
 3. **Format eksportu.** Markdown, CSV, PDF? Zależy od wzoru dziennika ze
    szkoły; poproś o niego opiekuna.
 4. **Nazwy i teksty komend.** Po polsku, krótko, spójnie.
-5. **Czy strona WWW jest w ogóle warta budowania** (etap dodatkowy).
+5. **Czy strona WWW jest w ogóle warta budowania** (etap dodatkowy): tak,
+   od 14.10, patrz D14.
 
 ## 7. Ryzyka
 
@@ -191,14 +195,15 @@ Każdą podejmijcie w jej zadaniu i wyjaśnijcie wybór w pull requeście:
 
 ## 8. Co zmieniło się po drodze i dlaczego
 
-| Gdzie      | Było                                            | Jest                                                              | Dlaczego                                                                                              |
-| ---------- | ----------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| D5         | plik SQLite z `better-sqlite3`, wolumen Dockera | Turso przez `@libsql/client`, lokalnie plik                       | system plików Vercela nie przeżywa deployu; jeden klient obsługuje plik, Turso i `:memory:` (#1, #14) |
-| D9         | zewnętrzny harmonogram, `POST` z `CRON_SECRET`  | Vercel Cron, `GET`, `Authorization: Bearer` dodawany przez Vercel | nie ma serwera na crona; dzienne uruchomienie z planu Hobby wystarcza na 15:00 (#1, #32)              |
-| D12 (nowa) | własny serwer, Docker                           | Vercel z `main`, podglądy na PR, własny deploy na dewelopera      | nic do utrzymania; stały adres na dewelopera zastępuje tunel (#1, #4)                                 |
-| D13 (nowa) | token bota + `DISCORD_REPORT_CHANNEL_ID`        | webhook kanału                                                    | jedno ustawienie, jeden kanał, bez uprawnień tokenu (#32)                                             |
-| §6.2       | otwarte                                         | godziny jako `7`, `7.5`, `7,5`, `7 h`; 0,25–16; teksty do 1000    | ustalone w #17                                                                                        |
-| §6.3       | otwarte                                         | Markdown, każdy dzień roboczy widoczny                            | ustalone w #27 bez wzoru ze szkoły; odwracalne                                                        |
-| #24        | po handlerach                                   | przed nimi                                                        | teksty w jednym pliku najpierw znaczy brak refaktoru później                                          |
-| #31        | otwarte                                         | 7 dni wstecz, starsze przez opiekuna                              | dziennik przepisany po tygodniach to nie dziennik                                                     |
-| #34        | Dockerfile                                      | zamknięte                                                         | bez Dockera na Vercelu                                                                                |
+| Gdzie           | Było                                            | Jest                                                              | Dlaczego                                                                                              |
+| --------------- | ----------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| D5              | plik SQLite z `better-sqlite3`, wolumen Dockera | Turso przez `@libsql/client`, lokalnie plik                       | system plików Vercela nie przeżywa deployu; jeden klient obsługuje plik, Turso i `:memory:` (#1, #14) |
+| D9              | zewnętrzny harmonogram, `POST` z `CRON_SECRET`  | Vercel Cron, `GET`, `Authorization: Bearer` dodawany przez Vercel | nie ma serwera na crona; dzienne uruchomienie z planu Hobby wystarcza na 15:00 (#1, #32)              |
+| D12 (nowa)      | własny serwer, Docker                           | Vercel z `main`, podglądy na PR, własny deploy na dewelopera      | nic do utrzymania; stały adres na dewelopera zastępuje tunel (#1, #4)                                 |
+| D13 (nowa)      | token bota + `DISCORD_REPORT_CHANNEL_ID`        | webhook kanału                                                    | jedno ustawienie, jeden kanał, bez uprawnień tokenu (#32)                                             |
+| §6.2            | otwarte                                         | godziny jako `7`, `7.5`, `7,5`, `7 h`; 0,25–16; teksty do 1000    | ustalone w #17                                                                                        |
+| §6.3            | otwarte                                         | Markdown, każdy dzień roboczy widoczny                            | ustalone w #27 bez wzoru ze szkoły; odwracalne                                                        |
+| #24             | po handlerach                                   | przed nimi                                                        | teksty w jednym pliku najpierw znaczy brak refaktoru później                                          |
+| #31             | otwarte                                         | 7 dni wstecz, starsze przez opiekuna                              | dziennik przepisany po tygodniach to nie dziennik                                                     |
+| #34             | Dockerfile                                      | zamknięte                                                         | bez Dockera na Vercelu                                                                                |
+| #38, D14 (nowa) | nie budujemy: brak czytelnika spoza Discorda    | `/raporty` za jednym hasłem                                       | opiekun poprosił o nią 14.10 (#38)                                                                    |
